@@ -10,7 +10,7 @@ from marginal_engine import Q, InputError, analyze, ltx, num, numeric, optimize_
 
 st.set_page_config(page_title="Marginal Analysis Workbench", page_icon="📈", layout="wide")
 
-BLUE, ORANGE, GREEN, PURPLE = "#2c56c9", "#d0632b", "#1d8357", "#8549c9"
+BLUE, ORANGE, GREEN, PURPLE = "#104226", "#ec6725", "#4fae68", "#6a7682"  # Sol-Millennium palette
 MODES = {"demand": "Demand curve P(Q)", "revenue": "Revenue R(Q)", "price": "Fixed market price P"}
 INPUT_LABEL = {"demand": "Inverse demand  P(Q) =", "revenue": "Total revenue  R(Q) =", "price": "Market price  P ="}
 

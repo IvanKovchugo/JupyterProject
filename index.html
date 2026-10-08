@@ -8,102 +8,108 @@
 <title>Marginal Analysis Workbench</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
-/* Layout: inputs rail on the left, live answer + chart on the right, worked solution and side tools stacked below. */
+/* Layout: inputs rail on the left, live answer + chart on the right, worked solution and side tools stacked below.
+   Type: Apple system faces (SF Pro / SF Mono) where installed; Inter and JetBrains Mono stand in elsewhere.
+   Color: Sol-Millennium palette — orange accent, forest/leaf greens, slate grey, mint-tinted neutrals. */
 :root{
-  --bg:#eef2f7; --panel:#ffffff; --ink:#15223a; --muted:#56637c; --line:#d6dde8; --grid:#e7ecf3;
-  --accent:#2c56c9; --accent-soft:#e3eafb;
-  --c-rev:#2c56c9; --c-cost:#c95a22; --c-pi:#1d8357; --c-alt:#8549c9;
-  --bad:#b4342b; --good:#1d8357;
-  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
-  --f-body:"Source Sans 3",ui-sans-serif,system-ui,sans-serif;
-  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
-  --r:10px;
+  --bg:#f3f6f4; --panel:#ffffff; --ink:#1b1d21; --head:#104226; --muted:#5f6b76; --line:#dde5e0; --grid:#e9efeb;
+  --accent:#ec6725; --accent-ink:#c4511a; --accent-soft:#fdeee5; --mint:#e1f0ec;
+  --c-rev:#104226; --c-cost:#ec6725; --c-pi:#4fae68; --c-alt:#6a7682;
+  --bad:#c0392b; --good:#2f8a4c;
+  --f-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",system-ui,sans-serif;
+  --f-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",system-ui,sans-serif;
+  --f-mono:"SF Mono",ui-monospace,Menlo,"JetBrains Mono",Consolas,monospace;
+  --r:14px; --shadow:0 1px 2px rgba(16,66,38,.06),0 4px 16px rgba(16,66,38,.06);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0e141f; --panel:#161f2e; --ink:#e5eaf3; --muted:#97a3ba; --line:#28344a; --grid:#212b3c;
-  --accent:#7f9dff; --accent-soft:#1f2b48;
-  --c-rev:#7f9dff; --c-cost:#f08a55; --c-pi:#4cc58c; --c-alt:#b88cf3; --bad:#ff7b70; --good:#4cc58c;
-  color-scheme:dark}}
+  --bg:#0c1712; --panel:#13221a; --ink:#e9f0eb; --head:#e1f0ec; --muted:#9db0a5; --line:#24392d; --grid:#1c2e24;
+  --accent:#f07a3e; --accent-ink:#ff9a66; --accent-soft:#3a2216; --mint:#173326;
+  --c-rev:#a7d4b9; --c-cost:#f07a3e; --c-pi:#65bc7b; --c-alt:#9aa5af; --bad:#ff7b6b; --good:#65bc7b;
+  --shadow:none; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0e141f; --panel:#161f2e; --ink:#e5eaf3; --muted:#97a3ba; --line:#28344a; --grid:#212b3c;
-  --accent:#7f9dff; --accent-soft:#1f2b48;
-  --c-rev:#7f9dff; --c-cost:#f08a55; --c-pi:#4cc58c; --c-alt:#b88cf3; --bad:#ff7b70; --good:#4cc58c;
-  color-scheme:dark}
+  --bg:#0c1712; --panel:#13221a; --ink:#e9f0eb; --head:#e1f0ec; --muted:#9db0a5; --line:#24392d; --grid:#1c2e24;
+  --accent:#f07a3e; --accent-ink:#ff9a66; --accent-soft:#3a2216; --mint:#173326;
+  --c-rev:#a7d4b9; --c-cost:#f07a3e; --c-pi:#65bc7b; --c-alt:#9aa5af; --bad:#ff7b6b; --good:#65bc7b;
+  --shadow:none; color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body)}
-.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:28px 48px;display:flex;flex-direction:column;gap:20px}
-header{display:flex;flex-direction:column;gap:6px}
-.eyebrow{font:600 12px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
-h1{font:700 clamp(28px,4.4vw,42px)/1.05 var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
-h2{font:700 20px/1.2 var(--f-display);margin:0;text-wrap:balance}
-h3{font:600 13px/1.2 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
-.lede{color:var(--muted);max-width:68ch;margin:0}
-code,.mono{font-family:var(--f-mono);font-size:.9em}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:36px 56px;display:flex;flex-direction:column;gap:22px}
+header{display:flex;flex-direction:column;gap:8px}
+.eyebrow{font:600 13px/1 var(--f-body);letter-spacing:.02em;color:var(--accent-ink)}
+h1{font:700 clamp(30px,4.6vw,46px)/1.05 var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.025em;color:var(--head)}
+h2{font:600 21px/1.2 var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.015em;color:var(--head)}
+.lede{color:var(--muted);max-width:68ch;margin:0;font-size:17px}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:22px;display:flex;flex-direction:column;gap:14px;min-width:0}
 .presets{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.presets span{font:600 12px var(--f-mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-right:4px}
-.chip{font:600 14px var(--f-body);border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 12px;border-radius:999px;cursor:pointer}
-.chip:hover{border-color:var(--accent)}
-.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--panel)}
-.grid{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:20px;align-items:start}
+.presets span{font:500 14px var(--f-body);color:var(--muted);margin-right:4px}
+.chip{font:500 14px var(--f-body);border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 14px;border-radius:999px;cursor:pointer}
+.chip:hover{border-color:var(--accent);color:var(--accent-ink)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.grid{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:22px;align-items:start}
 @media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
 .field{display:flex;flex-direction:column;gap:6px}
-label,.lbl{font-weight:600;font-size:14px}
-input[type=text],input[type=number]{font:15px var(--f-mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%}
-input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.seg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+label,.lbl{font-weight:500;font-size:14px;color:var(--ink)}
+input[type=text],input[type=number]{font:15px var(--f-mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--mint);border-radius:10px;padding:3px}
 .seg input{position:absolute;opacity:0;pointer-events:none}
-.seg label{text-align:center;padding:8px 4px;font-size:13px;cursor:pointer;border-left:1px solid var(--line);color:var(--muted)}
-.seg label:first-of-type{border-left:0}
-.seg input:checked+label{background:var(--accent-soft);color:var(--accent)}
+.seg label{text-align:center;padding:7px 4px;font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;color:var(--muted)}
+.seg input:checked+label{background:var(--panel);color:var(--head);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .seg input:focus-visible+label{outline:2px solid var(--accent);outline-offset:-2px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .hint{font-size:13px;color:var(--muted);margin:0}
 .err{color:var(--bad);font-weight:600;font-size:14px;margin:0}
-.note{font-size:13px;color:var(--muted);border-left:2px solid var(--line);padding-left:10px;margin:0}
+.note{font-size:13px;color:var(--ink);background:var(--mint);border-radius:10px;padding:10px 12px;margin:0}
 .tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 @media (max-width:620px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.tile{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:4px;min-width:0}
-.tile .k{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.tile .v{font:700 26px/1.1 var(--f-display);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.tile .s{font-size:13px;color:var(--muted)}
-.tile.hl{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tile .k{font:500 13px var(--f-body);color:var(--muted)}
+.tile .v{font:700 28px/1.1 var(--f-display);letter-spacing:-.02em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;color:var(--head)}
+.tile .s{font-size:12px;color:var(--muted)}
+.tile.hl{background:var(--accent);border-color:var(--accent)}
+.tile.hl .k,.tile.hl .s{color:rgba(255,255,255,.85)} .tile.hl .v{color:#fff}
 .results{display:flex;flex-direction:column;gap:16px;min-width:0}
-.tabs{display:flex;gap:6px;flex-wrap:wrap}
-.tab{font:600 13px var(--f-body);background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:5px 10px;cursor:pointer}
-.tab[aria-pressed="true"]{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.chartbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+.tabs{display:inline-flex;gap:2px;background:var(--mint);border-radius:10px;padding:3px;flex-wrap:wrap}
+.tab{font:500 13px var(--f-body);background:transparent;border:0;color:var(--muted);border-radius:8px;padding:6px 12px;cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--panel);color:var(--head);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .chartbox{overflow-x:auto}
 svg.chart{width:100%;height:auto;display:block;min-width:300px}
-svg.chart text{fill:var(--muted);font:11px var(--f-mono)}
+svg.chart text{fill:var(--muted);font:11px var(--f-body)}
 svg.chart .gridl{stroke:var(--grid);stroke-width:1}
-svg.chart .axis{stroke:var(--muted);stroke-width:1}
-svg.chart .ln{fill:none;stroke-width:2.2;stroke-linejoin:round}
-svg.chart .vl{stroke:var(--muted);stroke-dasharray:4 4;stroke-width:1}
-svg.chart .mk{stroke-width:2;fill:var(--panel)}
-svg.chart .mklab{fill:var(--ink);font-weight:600}
+svg.chart .axis{stroke:var(--muted);stroke-width:1;opacity:.6}
+svg.chart .ln{fill:none;stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+svg.chart .vl{stroke:var(--muted);stroke-dasharray:3 4;stroke-width:1;opacity:.7}
+svg.chart .mk{stroke-width:2.5;fill:var(--panel)}
+svg.chart .mklab{fill:var(--ink);font-weight:600;font-size:12px;paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round}
+svg.chart .lead{stroke:var(--muted);stroke-width:1;opacity:.6}
 .s-rev{stroke:var(--c-rev)} .s-cost{stroke:var(--c-cost)} .s-pi{stroke:var(--c-pi)} .s-alt{stroke:var(--c-alt)}
-.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin:0;padding:0;list-style:none}
-.legend i{display:inline-block;width:16px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--muted);margin:0;padding:0;list-style:none}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
 .b-rev{background:var(--c-rev)} .b-cost{background:var(--c-cost)} .b-pi{background:var(--c-pi)} .b-alt{background:var(--c-alt)}
-ol.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px}
-ol.steps li{padding-left:4px}
-ol.steps li::marker{font:600 13px var(--f-mono);color:var(--accent)}
-.eq{display:inline-block;font-family:var(--f-mono);font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 8px;margin:2px 0;overflow-wrap:anywhere}
+.zoomnote{font-size:12px;color:var(--muted);margin:0}
+ol.steps{margin:0;padding-left:24px;display:flex;flex-direction:column;gap:12px}
+ol.steps li{padding-left:6px;line-height:1.7}
+ol.steps li::marker{font:600 14px var(--f-body);color:var(--accent-ink)}
+.eq{display:inline-block;font-family:var(--f-mono);font-size:13.5px;background:var(--mint);color:var(--head);border-radius:6px;padding:1px 8px;margin:1px 0;overflow-wrap:anywhere}
 .ok{color:var(--good);font-weight:600}.warn{color:var(--bad);font-weight:600}
 .tablebox{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:15px}
-th,td{text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th,td{text-align:right;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
 th:first-child,td:first-child{text-align:left}
-thead th{font:600 12px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);vertical-align:bottom;white-space:normal}
-tr.total td{font-weight:700}
+thead th{font:600 13px var(--f-body);color:var(--head);vertical-align:bottom;white-space:normal}
+tr.total td{font-weight:700;border-bottom:0}
 td.best{color:var(--good)}
-.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:20px;align-items:start}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:22px;align-items:start}
 @media (max-width:860px){.two{grid-template-columns:minmax(0,1fr)}}
 .row3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
 footer{font-size:13px;color:var(--muted)}
-@media (prefers-reduced-motion:no-preference){.chip,.tab{transition:background .15s,border-color .15s}}
+footer a{color:var(--accent-ink)}
+@media (prefers-reduced-motion:no-preference){.chip,.tab,.seg label{transition:background .15s,border-color .15s,color .15s}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.min.js"></script>
 </head>
@@ -154,12 +160,19 @@ footer{font-size:13px;color:var(--muted)}
     <div class="results">
       <div class="tiles" id="tiles"></div>
       <div class="panel">
-        <div class="tabs" role="group" aria-label="Chart">
-          <button type="button" class="tab" data-tab="levels" aria-pressed="true">Revenue, cost, profit</button>
-          <button type="button" class="tab" data-tab="marginal" aria-pressed="false">MR and MC</button>
+        <div class="chartbar">
+          <div class="tabs" role="group" aria-label="Chart">
+            <button type="button" class="tab" data-tab="levels" aria-pressed="true">Revenue, cost, profit</button>
+            <button type="button" class="tab" data-tab="marginal" aria-pressed="false">MR and MC</button>
+          </div>
+          <div class="tabs" role="group" aria-label="Zoom">
+            <button type="button" class="tab" data-zoom="focus" aria-pressed="true">Focus</button>
+            <button type="button" class="tab" data-zoom="full" aria-pressed="false">Full range</button>
+          </div>
         </div>
         <div class="chartbox"><svg class="chart" id="chart" viewBox="0 0 640 300" role="img" aria-label="Chart of the firm's functions"></svg></div>
         <ul class="legend" id="legend"></ul>
+        <p class="zoomnote" id="zoomNote" hidden></p>
       </div>
     </div>
   </div>
@@ -193,7 +206,7 @@ footer{font-size:13px;color:var(--muted)}
     </div>
   </section>
 
-  <footer>Derivatives are symbolic (math.js). Optimum, break-even and critical points are found numerically on [0, capacity] and refined to about 1e-10, then rounded to 4 decimals. Source and the Python (exact-answer) version: <a href="https://github.com/IvanKovchugo/JupyterProject" style="color:var(--accent)">github.com/IvanKovchugo/JupyterProject</a>.</footer>
+  <footer>Derivatives are symbolic (math.js). Optimum, break-even and critical points are found numerically on [0, capacity] and refined to about 1e-10, then rounded to 4 decimals. Source and the Python (exact-answer) version: <a href="https://github.com/IvanKovchugo/JupyterProject">github.com/IvanKovchugo/JupyterProject</a>.</footer>
 </div>
 
 <script>
@@ -337,7 +350,7 @@ function drawChart(svg, o){
   const pw=W-m.l-m.r, ph=H-m.t-m.b, N=260;
   const data = o.series.map(s=>{ const pts=[]; for(let i=0;i<=N;i++){ const x=o.x0+(o.x1-o.x0)*i/N; pts.push([x,s.f(x)]); } return pts; });
   let ys = [0]; data.forEach(p=>p.forEach(([,y])=>{ if(isFinite(y)) ys.push(y); }));
-  (o.markers||[]).forEach(mk=>isFinite(mk.y)&&ys.push(mk.y));
+  (o.markers||[]).forEach(mk=>isFinite(mk.y)&&mk.x>=o.x0&&mk.x<=o.x1&&ys.push(mk.y));
   ys.sort((a,b)=>a-b);
   let lo=ys[0], hi=ys[ys.length-1];
   if(ys.length>40){ const q=k=>ys[Math.floor(k*(ys.length-1))]; const qlo=q(.02), qhi=q(.98); const sp=qhi-qlo||1;
@@ -362,17 +375,37 @@ function drawChart(svg, o){
     h+=`<path class="ln ${o.series[i].cls}" d="${d}"${o.series[i].dash?' stroke-dasharray="6 4"':''}/>`;
   });
   h+='</g>';
-  (o.markers||[]).forEach(mk=>{
-    if(!isFinite(mk.y)||mk.x<o.x0||mk.x>o.x1||mk.y<lo||mk.y>hi) return;
-    const cx=X(mk.x), cy=Y(mk.y), right = cx < m.l+pw*0.7;
-    h+=`<circle class="mk ${mk.cls}" cx="${cx}" cy="${cy}" r="4.5"/>`;
-    if(mk.label) h+=`<text class="mklab" x="${cx+(right?8:-8)}" y="${cy-8}" text-anchor="${right?'start':'end'}">${mk.label}</text>`;
+  // Markers first, then labels placed one by one in the first free slot so none overlap.
+  const vis=(o.markers||[]).filter(mk=>isFinite(mk.y)&&mk.x>=o.x0&&mk.x<=o.x1&&mk.y>=lo&&mk.y<=hi)
+    .map(mk=>({...mk,cx:X(mk.x),cy:Y(mk.y)}));
+  const boxes=vis.map(p=>[p.cx-6,p.cy-6,p.cx+6,p.cy+6]);
+  const hit=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];
+  const slots=[];
+  for(const dy of [-14,20,-32,38,-50,56,-68]) for(const dx of [10,-10]) slots.push([dx,dy]);
+  let labels='';
+  vis.forEach(p=>{
+    h+=`<circle class="mk ${p.cls}" cx="${p.cx}" cy="${p.cy}" r="5"/>`;
+    if(!p.label) return;
+    const w=p.label.length*7+6, th=14;
+    let pick=null;
+    for(const [dx,dy] of slots){
+      const x=dx>0?p.cx+dx:p.cx+dx-w, y=p.cy+dy;
+      const b=[x,y-th+3,x+w,y+4];
+      if(b[0]<m.l+2||b[2]>W-m.r||b[1]<m.t||b[3]>H-m.b) continue;
+      if(boxes.some(q=>hit(b,q))) continue;
+      pick={dx,dy,b}; break;
+    }
+    if(!pick){ const x=p.cx+10; pick={dx:10,dy:-14,b:[x,p.cy-25,x+w,p.cy-10]}; }
+    boxes.push(pick.b);
+    const tx=pick.dx>0?pick.b[0]:pick.b[2], ty=p.cy+pick.dy;
+    if(Math.abs(pick.dy)>20) labels+=`<line class="lead" x1="${p.cx}" y1="${p.cy}" x2="${pick.dx>0?pick.b[0]:pick.b[2]}" y2="${ty-4}"/>`;
+    labels+=`<text class="mklab" x="${tx}" y="${ty}" text-anchor="${pick.dx>0?'start':'end'}">${p.label}</text>`;
   });
-  svg.innerHTML=h;
+  svg.innerHTML=h+labels;
 }
 
 /* ---------- state ---------- */
-let mode='demand', tab='levels', activePreset='p4a';
+let mode='demand', tab='levels', zoom='focus', activePreset='p4a';
 const LS='maw-v1';
 function save(){ try{ localStorage.setItem(LS, JSON.stringify({mode, rev:$('revIn').value, cost:$('costIn').value, share:$('shareIn').value, cap:$('capIn').value, ff:$('ffIn').value, a:$('ffA').value, b:$('ffB').value})); }catch(e){} }
 function load(){ try{ const s=JSON.parse(localStorage.getItem(LS)||'null'); if(!s) return false;
@@ -495,14 +528,23 @@ function render(){
   renderFranchise(m,s);
 
   // chart
-  const xmax = s.Qmax;
+  // Focus zooms to where the decision happens (around Q* and break-even), so a far-away
+  // demand intercept doesn't squash the interesting part of the chart.
+  let xmax = s.Qmax;
+  if(zoom==='focus' && o && !s.unbounded){
+    const pts=[2*Q, ...s.be.map(x=>1.2*x)].filter(x=>isFinite(x)&&x>0);
+    if(pts.length) xmax=Math.min(s.Qmax, Math.max(...pts));
+  }
+  const hidden = mode!=='price' && s.rev && !s.revUnbounded && s.rev.x>xmax;
+  $('zoomNote').hidden=!hidden;
+  if(hidden) $('zoomNote').textContent=`Revenue peaks at Q = ${fmt(s.rev.x)}, beyond this view. Switch to Full range to see it.`;
   let series, markers=[], vlines=[], leg;
   if(tab==='levels'){
     series=[{f:f.R,cls:'s-rev'},{f:f.C,cls:'s-cost'},{f:f.Pi,cls:'s-pi'}];
     leg=[['b-rev','Revenue R'],['b-cost','Cost C'],['b-pi','Profit π']];
-    if(o && (!s.unbounded||m.capSet)){ markers.push({x:Q,y:o.y,cls:'s-pi',label:`π* at Q=${fmt(Q,2)}`}); vlines.push(Q); }
-    if(mode!=='price' && s.rev && !s.revUnbounded) markers.push({x:s.rev.x,y:s.rev.y,cls:'s-rev',label:`max R at Q=${fmt(s.rev.x,2)}`});
-    s.be.forEach(x=>markers.push({x,y:f.R(x),cls:'s-cost',label:`BE ${fmt(x,2)}`}));
+    if(o && (!s.unbounded||m.capSet)){ markers.push({x:Q,y:o.y,cls:'s-pi',label:`Max profit · Q=${fmt(Q,2)}`}); vlines.push(Q); }
+    if(mode!=='price' && s.rev && !s.revUnbounded) markers.push({x:s.rev.x,y:s.rev.y,cls:'s-rev',label:`Max revenue · Q=${fmt(s.rev.x,2)}`});
+    s.be.forEach(x=>markers.push({x,y:f.R(x),cls:'s-cost',label:`Break-even ${fmt(x,2)}`}));
   } else {
     series=[{f:f.MR,cls:'s-rev'},{f:f.MC,cls:'s-cost'}];
     leg=[['b-rev','MR'],['b-cost','MC']];
@@ -595,7 +637,8 @@ let tmr; const later=fnc=>{ clearTimeout(tmr); tmr=setTimeout(fnc,180); };
 $('model').addEventListener('submit',e=>e.preventDefault());
 ['revIn','costIn','shareIn','capIn'].forEach(id=>$(id).addEventListener('input',()=>{ activePreset=null; markPresets(); $('presetNote').hidden=true; later(render); }));
 document.querySelectorAll('input[name=mode]').forEach(r=>r.addEventListener('change',()=>{ setMode(r.value); activePreset=null; markPresets(); render(); }));
-document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{ tab=b.dataset.tab; document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-pressed',String(x===b))); render(); }));
+document.querySelectorAll('.tab[data-tab]').forEach(b=>b.addEventListener('click',()=>{ tab=b.dataset.tab; document.querySelectorAll('.tab[data-tab]').forEach(x=>x.setAttribute('aria-pressed',String(x===b))); render(); }));
+document.querySelectorAll('.tab[data-zoom]').forEach(b=>b.addEventListener('click',()=>{ zoom=b.dataset.zoom; document.querySelectorAll('.tab[data-zoom]').forEach(x=>x.setAttribute('aria-pressed',String(x===b))); render(); }));
 ['ffIn','ffA','ffB'].forEach(id=>$(id).addEventListener('input',()=>later(renderFree)));
 
 if(!load()) { applyPreset(PRESETS[1]); } else { markPresets(); render(); }
