@@ -62,3 +62,12 @@ def test_rejects_unsafe_input(text):
 def test_decimal_comma_and_lowercase_q():
     expr, _ = parse("0,5q^2")
     assert expr == sp.Rational(1, 2) * sp.Symbol("Q", real=True) ** 2
+
+
+def test_problem_14_each_part_has_steps_and_answer():
+    r = analyze("demand", "3 - Q/800", "0.8Q", share_pct=20)
+    a, b, c = r.franchise
+    assert all(s.steps for s in r.franchise)
+    assert a.answer.startswith("Q = 1,200, P = 1.5") and "gets 360" in a.answer and "nets 480" in a.answer
+    assert b.answer.startswith("Q = 800, P = 2") and "gets 320" in b.answer and "nets 640" in b.answer
+    assert "Q = 880, P = 1.9" in c.answer and "968" in c.answer

@@ -12,26 +12,26 @@
 <style>
 /* Layout: inputs rail on the left, live answer + chart on the right, worked solution and side tools stacked below.
    Type: Apple system faces (SF Pro / SF Mono) where installed; Inter and JetBrains Mono stand in elsewhere.
-   Color: Sol-Millennium palette — orange accent, forest/leaf greens, slate grey, mint-tinted neutrals. */
+   Color: deep and bright greens with a slate-blue contrast series on green-tinted neutrals. */
 :root{
-  --bg:#f3f6f4; --panel:#ffffff; --ink:#1b1d21; --head:#104226; --muted:#5f6b76; --line:#dde5e0; --grid:#e9efeb;
-  --accent:#ec6725; --accent-ink:#c4511a; --accent-soft:#fdeee5; --mint:#e1f0ec;
-  --c-rev:#104226; --c-cost:#ec6725; --c-pi:#4fae68; --c-alt:#6a7682;
-  --bad:#c0392b; --good:#2f8a4c;
+  --bg:#f4f6f5; --panel:#ffffff; --ink:#1a1f1c; --head:#0b3d2c; --muted:#5d6862; --line:#dfe5e1; --grid:#ebf0ed;
+  --accent:#1d7a4f; --accent-ink:#156a43; --accent-soft:#e3f2ea; --mint:#e9f3ee; --on-accent:#ffffff;
+  --c-rev:#0b3d2c; --c-cost:#3f5f8a; --c-pi:#2fb574; --c-alt:#8a949b;
+  --bad:#c0392b; --good:#1d7a4f;
   --f-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",system-ui,sans-serif;
   --f-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",system-ui,sans-serif;
   --f-mono:"SF Mono",ui-monospace,Menlo,"JetBrains Mono",Consolas,monospace;
-  --r:14px; --shadow:0 1px 2px rgba(16,66,38,.06),0 4px 16px rgba(16,66,38,.06);
+  --r:14px; --shadow:0 1px 2px rgba(11,61,44,.06),0 4px 16px rgba(11,61,44,.06);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0c1712; --panel:#13221a; --ink:#e9f0eb; --head:#e1f0ec; --muted:#9db0a5; --line:#24392d; --grid:#1c2e24;
-  --accent:#f07a3e; --accent-ink:#ff9a66; --accent-soft:#3a2216; --mint:#173326;
-  --c-rev:#a7d4b9; --c-cost:#f07a3e; --c-pi:#65bc7b; --c-alt:#9aa5af; --bad:#ff7b6b; --good:#65bc7b;
+  --bg:#0b1511; --panel:#121f19; --ink:#e8efea; --head:#e3f2ea; --muted:#9cb0a4; --line:#22362b; --grid:#1a2b22;
+  --accent:#33c47f; --accent-ink:#5bd697; --accent-soft:#143324; --mint:#16291f; --on-accent:#06140d;
+  --c-rev:#b9e3cb; --c-cost:#8fb0dd; --c-pi:#33c47f; --c-alt:#9aa5af; --bad:#ff7b6b; --good:#5bd697;
   --shadow:none; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0c1712; --panel:#13221a; --ink:#e9f0eb; --head:#e1f0ec; --muted:#9db0a5; --line:#24392d; --grid:#1c2e24;
-  --accent:#f07a3e; --accent-ink:#ff9a66; --accent-soft:#3a2216; --mint:#173326;
-  --c-rev:#a7d4b9; --c-cost:#f07a3e; --c-pi:#65bc7b; --c-alt:#9aa5af; --bad:#ff7b6b; --good:#65bc7b;
+  --bg:#0b1511; --panel:#121f19; --ink:#e8efea; --head:#e3f2ea; --muted:#9cb0a4; --line:#22362b; --grid:#1a2b22;
+  --accent:#33c47f; --accent-ink:#5bd697; --accent-soft:#143324; --mint:#16291f; --on-accent:#06140d;
+  --c-rev:#b9e3cb; --c-cost:#8fb0dd; --c-pi:#33c47f; --c-alt:#9aa5af; --bad:#ff7b6b; --good:#5bd697;
   --shadow:none; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
@@ -47,7 +47,7 @@ code,.mono{font-family:var(--f-mono);font-size:.88em}
 .presets span{font:500 14px var(--f-body);color:var(--muted);margin-right:4px}
 .chip{font:500 14px var(--f-body);border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 14px;border-radius:999px;cursor:pointer}
 .chip:hover{border-color:var(--accent);color:var(--accent-ink)}
-.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .grid{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:22px;align-items:start}
 @media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
 .field{display:flex;flex-direction:column;gap:6px}
@@ -71,7 +71,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .tile .v{font:700 28px/1.1 var(--f-display);letter-spacing:-.02em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;color:var(--head)}
 .tile .s{font-size:12px;color:var(--muted)}
 .tile.hl{background:var(--accent);border-color:var(--accent)}
-.tile.hl .k,.tile.hl .s{color:rgba(255,255,255,.85)} .tile.hl .v{color:#fff}
+.tile.hl .k,.tile.hl .s{color:rgba(255,255,255,.85)} .tile.hl .v{color:var(--on-accent)}
 .results{display:flex;flex-direction:column;gap:16px;min-width:0}
 .chartbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center}
 .tabs{display:inline-flex;gap:2px;background:var(--mint);border-radius:10px;padding:3px;flex-wrap:wrap}
@@ -91,6 +91,14 @@ svg.chart .lead{stroke:var(--muted);stroke-width:1;opacity:.6}
 .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--muted);margin:0;padding:0;list-style:none}
 .legend i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
 .b-rev{background:var(--c-rev)} .b-cost{background:var(--c-cost)} .b-pi{background:var(--c-pi)} .b-alt{background:var(--c-alt)}
+.parts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:860px){.parts{grid-template-columns:minmax(0,1fr)}}
+.part{border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.part h3{font:600 16px/1.3 var(--f-display);color:var(--head);margin:0;display:flex;gap:10px;align-items:baseline}
+.part h3 b{display:inline-grid;place-items:center;min-width:26px;height:26px;border-radius:8px;background:var(--accent);color:var(--on-accent);font-size:14px}
+.part .q{font-size:14px;color:var(--muted);margin:0;font-style:italic}
+.part ol.steps{gap:8px;font-size:15px}
+.part .ans{margin:0;font-weight:600;color:var(--head);background:var(--mint);border-radius:10px;padding:8px 12px}
 .zoomnote{font-size:12px;color:var(--muted);margin:0}
 ol.steps{margin:0;padding-left:24px;display:flex;flex-direction:column;gap:12px}
 ol.steps li{padding-left:6px;line-height:1.7}
@@ -177,16 +185,16 @@ footer a{color:var(--accent-ink)}
     </div>
   </div>
 
-  <section class="panel">
-    <h2>Worked solution</h2>
-    <ol class="steps" id="steps"></ol>
-  </section>
-
   <section class="panel" id="franP" hidden>
-    <h2>Who sets price and quantity?</h2>
+    <h2>Franchise problem, part by part</h2>
     <p class="hint" id="franLede"></p>
     <div class="tablebox"><table id="franT"></table></div>
-    <div id="franNotes" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="parts" id="franParts"></div>
+  </section>
+
+  <section class="panel">
+    <h2 id="stepsTitle">Worked solution</h2>
+    <ol class="steps" id="steps"></ol>
   </section>
 
   <section class="panel">
@@ -475,7 +483,7 @@ function render(){
 
   // tiles
   let t='';
-  t+=tile('Profit-max Q*', s.unbounded && !m.capSet ? '∞' : fmt(Q), s.unbounded ? (m.capSet?'corner: at capacity':'no interior maximum') : 'where MR = MC', true);
+  t+=tile(m.share>0?'Joint optimum Q* (part c)':'Profit-max Q*', s.unbounded && !m.capSet ? '∞' : fmt(Q), s.unbounded ? (m.capSet?'corner: at capacity':'no interior maximum') : 'where MR = MC', true);
   t+=tile('Price P*', fmt(P), mode==='price'?'fixed by the market':'from demand at Q*');
   t+=tile('Max profit π*', s.unbounded && !m.capSet ? '∞' : fmt(o?o.y:NaN), o && o.y<0 ? 'a loss: minimizes losses' : 'R − C at Q*');
   if(mode==='price') t+=tile('Break-even Q', s.be.length? s.be.map(x=>fmt(x)).join(', ') : 'none', 'where π = 0');
@@ -558,39 +566,75 @@ function render(){
 
 function renderFranchise(m,s){
   const box=$('franP');
+  $('stepsTitle').textContent = m.share>0 ? 'General analysis (MR = MC, revenue maximum)' : 'Worked solution';
   if(!(m.share>0)){ box.hidden=true; return; }
   box.hidden=false;
-  const f=m.f, k=1-m.share, a=0, b=s.Qmax;
+  const f=m.f, k=1-m.share, a=0, b=s.Qmax, sp=fmt(m.share*100,2)+'%', kp=fmt(k*100,2)+'%';
   const G=x=>k*f.R(x)-f.C(x), dG=x=>k*f.MR(x)-f.MC(x);
+  const Gn=M.parse(`${k}*(${m.Rn.toString()}) - (${m.Cn.toString()})`), dGn=M.derivative(Gn,'Q');
   const sc=[
-    {h:'Franchisor sets it', sub:'max its take sR → MR = 0', r:argmax(f.R,f.MR,a,b)},
-    {h:'Franchisee sets it', sub:`max (1−s)R − C → ${fmt(k,2)}·MR = MC`, r:argmax(G,dG,a,b)},
-    {h:'Joint / profit sharing', sub:'max R − C → MR = MC', r:s.opt},
+    {h:'(a) Franchisor sets', sub:'max sR → MR = 0', r:argmax(f.R,f.MR,a,b)},
+    {h:'(b) Franchisee sets', sub:`max (1−s)R − C → ${fmt(k,2)}·MR = MC`, r:argmax(G,dG,a,b)},
+    {h:'(c) Profit sharing', sub:'max R − C → MR = MC', r:s.opt},
   ];
   const rows=[
     ['Quantity Q', r=>r.x],
     ['Price P', r=>f.P(r.x)],
     ['Revenue R', r=>f.R(r.x)],
     ['Franchisee costs C', r=>f.C(r.x)],
-    [`Franchisor receives (${fmt(m.share*100,2)}% of R)`, r=>m.share*f.R(r.x)],
+    [`Franchisor receives (${sp} of R)`, r=>m.share*f.R(r.x)],
     ['Franchisee net profit', r=>G(r.x)],
     ['Total profit (both parties)', r=>f.Pi(r.x)],
   ];
   const tot = sc.map(c=>c.r?f.Pi(c.r.x):-Infinity), best=Math.max(...tot);
-  let h='<thead><tr><th></th>'+sc.map(c=>`<th>${c.h}<br><span style="text-transform:none;letter-spacing:0;font-weight:400">${c.sub}</span></th>`).join('')+'</tr></thead><tbody>';
+  let h='<thead><tr><th></th>'+sc.map(c=>`<th>${c.h}<br><span style="font-weight:400;color:var(--muted)">${c.sub}</span></th>`).join('')+'</tr></thead><tbody>';
   rows.forEach(([lab,g],i)=>{
     const last=i===rows.length-1;
     h+=`<tr${last?' class="total"':''}><td>${lab}</td>`+sc.map((c,j)=>`<td${last&&Math.abs(tot[j]-best)<1e-9?' class="best"':''}>${c.r?fmt(g(c.r)):'—'}</td>`).join('')+'</tr>';
   });
   $('franT').innerHTML=h+'</tbody>';
-  $('franLede').textContent=`The franchisor takes s = ${fmt(m.share*100,2)}% of revenue; the franchisee pays all of C(Q). Each party prefers a different output.`;
-  const r0=sc[0].r, r1=sc[1].r;
-  $('franNotes').innerHTML=[
-    `The franchisor wants maximum revenue, so it pushes output to where MR = 0 and ignores the franchisee's costs.`,
-    `The franchisee keeps only ${fmt(k*100,2)}¢ of each extra revenue dollar, so it stops where ${fmt(k,2)}·MR = MC: output ${r1&&r0&&r1.x<r0.x?'lower':'different'}, price higher. Total profit ${fmt(r1?f.Pi(r1.x):NaN)} vs ${fmt(r0?f.Pi(r0.x):NaN)} when the franchisor sets it.`,
-    `Profit sharing: if the franchisor gets any share α of R − C, each side maximizes α(R − C) or (1 − α)(R − C), both maximized where MR = MC. The split does not change Q or P. Total profit is the highest possible, ${fmt(s.opt?s.opt.y:NaN)}.`,
-    `Why it is rare: profit is easy to manipulate and costly to audit (the franchisee can inflate costs or pay itself a salary), while revenue is simple to verify. Profit sharing also exposes the franchisor to the operator's cost inefficiency.`
-  ].map(x=>`<p class="note">${x}</p>`).join('');
+  $('franLede').textContent=`The franchisor takes s = ${sp} of revenue and supplies inputs at cost; the franchisee pays all of C(Q). The table compares the three arrangements; each part is solved step by step below.`;
+
+  const at=r=>({Q:r.x, P:f.P(r.x), R:f.R(r.x), C:f.C(r.x), fr:m.share*f.R(r.x), fe:G(r.x), tot:f.Pi(r.x)});
+  const outcome=v=>`${eq('P = '+fmt(v.P))}, ${eq('R = '+fmt(v.R))}, ${eq('C = '+fmt(v.C))}`;
+  const split=v=>`Franchisor receives ${eq(`${fmt(m.share,4)} × ${fmt(v.R)} = ${fmt(v.fr)}`)}. Franchisee nets ${eq(`${fmt(k,4)} × ${fmt(v.R)} − ${fmt(v.C)} = ${fmt(v.fe)}`)}.`;
+  const card=(letter,title,q,steps,ans)=>`<div class="part"><h3><b>${letter}</b>${title}</h3><p class="q">${q}</p><ol class="steps">${steps.map(x=>`<li>${x}</li>`).join('')}</ol>${ans?`<p class="ans">${ans}</p>`:''}</div>`;
+  const parts=[];
+  const [A,B,Cc]=sc.map(c=>c.r?at(c.r):null);
+
+  if(A) parts.push(card('a','Franchisor sets price and quantity','What Q and P maximize the franchisor\'s take, and what does each side earn?',[
+    `The franchisor earns ${eq('s·R(Q) = '+fmt(m.share,4)+'·R(Q)')} and pays none of the costs, so maximizing its take is the same as maximizing revenue.`,
+    `${eq('d(sR)/dQ = s·MR = 0')} → ${eq('MR = '+show(m.MRn)+' = 0')} → ${eq('Q = '+fmt(A.Q))}`,
+    `Price and totals: ${outcome(A)}`,
+    split(A),
+  ], `Q = ${fmt(A.Q)}, P = ${fmt(A.P)}. Franchisor gets ${fmt(A.fr)}, franchisee nets ${fmt(A.fe)}. Total ${fmt(A.tot)}.`));
+
+  if(B) parts.push(card('b','Franchisee sets price and quantity',`The owner keeps only ${kp} of each extra revenue dollar. What Q and P does the owner choose?`,[
+    `Franchisee's profit: ${eq('π_F = (1 − s)R − C = '+show(Gn))}`,
+    `${eq('π_F′ = (1 − s)·MR − MC = '+show(dGn)+' = 0')}, i.e. ${eq(fmt(k,4)+'·MR = MC')} → ${eq('Q = '+fmt(B.Q))}`,
+    `Price and totals: ${outcome(B)}`,
+    split(B),
+    A?`Total profit ${eq(fmt(B.tot))} vs ${eq(fmt(A.tot))} in part a: ${B.tot>A.tot?`<span class="ok">${fmt(B.tot-A.tot)} higher</span>`:`${fmt(A.tot-B.tot)} lower`}. The owner restricts output (Q ${fmt(B.Q)} &lt; ${fmt(A.Q)}) and charges more, because the ${sp} revenue cut works like a tax on each sale.`:'',
+  ].filter(Boolean), `Q = ${fmt(B.Q)}, P = ${fmt(B.P)}. Franchisor gets ${fmt(B.fr)}, franchisee nets ${fmt(B.fe)}. Total ${fmt(B.tot)}.`));
+
+  if(Cc){
+    parts.push(card('c','Profit sharing','If the franchisor takes a share α of profit instead of revenue, does the conflict disappear? Does α matter?',[
+      `Franchisor gets ${eq('α(R − C)')}, franchisee gets ${eq('(1 − α)(R − C)')}. For any α between 0 and 1, both are maximized where ${eq('R − C')} is maximized, so <span class="ok">the conflict disappears</span>.`,
+      `${eq('π′ = MR − MC = '+show(m.dPiN)+' = 0')} → ${eq('Q = '+fmt(Cc.Q))}`,
+      `Price and totals: ${outcome(Cc)}, total profit ${eq('π = '+fmt(Cc.tot))}`,
+      `α only changes how the ${fmt(Cc.tot)} is divided (α = 50% gives each side ${fmt(Cc.tot/2)}), not Q or P.`,
+      `This is the highest total of the three arrangements${A&&B?` (vs ${fmt(A.tot)} in a and ${fmt(B.tot)} in b)`:''}.`,
+    ], `Yes, the conflict disappears. Q = ${fmt(Cc.Q)}, P = ${fmt(Cc.P)}, total profit ${fmt(Cc.tot)}, whatever the split.`));
+  }
+
+  parts.push(card('d','Why profit sharing is rare','What are its disadvantages compared with revenue sharing?',[
+    `<b>Hard to verify.</b> Revenue is easy to observe and audit; profit depends on costs the franchisee reports.`,
+    `<b>Incentive to inflate costs.</b> The owner can shift profit into costs (a high salary, family on the payroll, perks), shrinking what is shared.`,
+    `<b>Monitoring is expensive.</b> The franchisor would need to audit every outlet's books.`,
+    `<b>The franchisor carries the operator's inefficiency</b> and risk: a badly run outlet pays little even with good sales.`,
+  ], 'Revenue sharing distorts output a little but is cheap and hard to cheat, so franchisors prefer it.'));
+
+  $('franParts').innerHTML=parts.join('');
 }
 
 /* ---------- free-form optimizer ---------- */

@@ -10,7 +10,7 @@ def test_preset_renders(name):
     at = AppTest.from_file("app.py", default_timeout=60).run()
     next(b for b in at.sidebar.button if b.label == name).click().run()
     assert not at.exception and not at.error
-    assert at.metric[0].label == "Profit-max Q*"
+    assert at.metric[0].label in ("Profit-max Q*", "Joint optimum Q* (part c)")
 
 
 def test_problem_14_franchise_table():

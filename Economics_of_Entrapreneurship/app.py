@@ -6,11 +6,11 @@ import numpy as np
 import plotly.graph_objects as go
 import streamlit as st
 
-from marginal_engine import Q, InputError, analyze, ltx, num, numeric, optimize_any, tex
+from marginal_engine import PROFIT_SHARING_DRAWBACKS, Q, InputError, analyze, ltx, num, numeric, optimize_any, tex
 
 st.set_page_config(page_title="Marginal Analysis Workbench", page_icon="📈", layout="wide")
 
-BLUE, ORANGE, GREEN, PURPLE = "#104226", "#ec6725", "#4fae68", "#6a7682"  # Sol-Millennium palette
+BLUE, ORANGE, GREEN, PURPLE = "#0b3d2c", "#3f5f8a", "#2fb574", "#8a949b"  # revenue, cost, profit, extra
 MODES = {"demand": "Demand curve P(Q)", "revenue": "Revenue R(Q)", "price": "Fixed market price P"}
 INPUT_LABEL = {"demand": "Inverse demand  P(Q) =", "revenue": "Total revenue  R(Q) =", "price": "Market price  P ="}
 
@@ -81,7 +81,7 @@ inf = r.unbounded and not r.capacity_set
 
 with right:
     m = st.columns(4)
-    m[0].metric("Profit-max Q*", "∞" if inf else num(o.x),
+    m[0].metric("Joint optimum Q* (part c)" if r.share > 0 else "Profit-max Q*", "∞" if inf else num(o.x),
                 help="Where MR = MC" if not r.unbounded else "No interior maximum")
     m[1].metric("Price P*", num(r.price_at(o.x)))
     m[2].metric("Max profit π*", "∞" if inf else num(o.y))
@@ -131,14 +131,14 @@ with right:
         st.plotly_chart(layout(fig), width="stretch")
 
 # ---------------------------------------------------------------- detail tabs
-tabs = ["Worked solution"] + (["Franchise"] if r.share > 0 else []) + ["Any-function optimizer"]
+tabs = (["Franchise (parts a–d)"] if r.share > 0 else []) + ["Worked solution"] + ["Any-function optimizer"]
 tab = dict(zip(tabs, st.tabs(tabs)))
 
 with tab["Worked solution"]:
     st.markdown("\n".join(f"{i}. {s}" for i, s in enumerate(r.steps, 1)))
 
-if "Franchise" in tab:
-    with tab["Franchise"]:
+if "Franchise (parts a–d)" in tab:
+    with tab["Franchise (parts a–d)"]:
         keep = 1 - r.share
         st.markdown(f"The franchisor takes **s = {num(r.share * 100, 2)}%** of revenue; the franchisee pays all of C(Q). "
                     "Each party prefers a different output.")
@@ -156,18 +156,19 @@ if "Franchise" in tab:
         for label, g in rows.items():
             table.append(f"| {label} | " + " | ".join(num(g(s.opt.x)) if s.opt else "—" for s in r.franchise) + " |")
         st.markdown("\n".join(table), unsafe_allow_html=True)
-        fr, fe, _ = r.franchise
-        st.markdown(
-            f"- **Franchisor sets it:** it wants maximum revenue, so it pushes output to MR = 0 and ignores the "
-            f"franchisee's costs.\n"
-            f"- **Franchisee sets it:** it keeps only {num(keep * 100, 2)}¢ of each extra revenue dollar, so it stops "
-            f"where {num(keep, 2)}·MR = MC: lower output, higher price. Total profit "
-            f"{num(r.profit.subs(Q, fe.opt.x))} vs {num(r.profit.subs(Q, fr.opt.x))}.\n"
-            f"- **Profit sharing:** if the franchisor gets any share α of R − C, both sides maximize R − C, so both "
-            f"want MR = MC. The split does not change Q or P, and total profit is the highest possible, {num(o.y)}.\n"
-            "- **Why profit sharing is rare:** profit is easy to manipulate and costly to audit (the franchisee can "
-            "inflate costs or pay itself a large salary), while revenue is simple to verify."
-        )
+        titles = {"a": "Franchisor sets price and quantity", "b": "Franchisee sets price and quantity",
+                  "c": "Profit sharing"}
+        cols = st.columns(2)
+        for n, (letter, sc) in enumerate(zip("abc", r.franchise)):
+            with cols[n % 2].container(border=True):
+                st.markdown(f"#### ({letter}) {titles[letter]}")
+                st.markdown("\n".join(f"{k}. {s}" for k, s in enumerate(sc.steps, 1)))
+                if sc.answer:
+                    st.success(sc.answer)
+        with cols[1].container(border=True):
+            st.markdown("#### (d) Why profit sharing is rare")
+            st.markdown("\n".join(f"- {d}" for d in PROFIT_SHARING_DRAWBACKS))
+            st.success("Revenue sharing distorts output a little but is cheap and hard to cheat, so franchisors prefer it.")
 
 with tab["Any-function optimizer"]:
     st.caption("For anything that isn't a revenue/cost setup: utility, average cost, production functions. "

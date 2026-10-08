@@ -232,6 +232,8 @@ class Scenario:
     title: str
     rule: str
     opt: Extremum | None
+    steps: list[str] = field(default_factory=list)
+    answer: str = ""
 
 
 @dataclass
@@ -315,10 +317,11 @@ def analyze(mode: str, demand_text: str, cost_text: str, share_pct: float = 0, c
         keep = 1 - share
         G = keep * R - C
         res.franchise = [
-            Scenario("Franchisor sets it", r"max $sR$ → $MR = 0$", argmax(R, MR, 0, q_max)),
-            Scenario("Franchisee sets it", rf"max $(1-s)R - C$ → ${sp.latex(keep)}\,MR = MC$", argmax(G, sp.diff(G, Q), 0, q_max)),
-            Scenario("Joint / profit sharing", r"max $R - C$ → $MR = MC$", opt),
+            Scenario("(a) Franchisor sets", r"max $sR$ → $MR = 0$", argmax(R, MR, 0, q_max)),
+            Scenario("(b) Franchisee sets", rf"max $(1-s)R - C$ → ${sp.latex(keep)}\,MR = MC$", argmax(G, sp.diff(G, Q), 0, q_max)),
+            Scenario("(c) Profit sharing", r"max $R - C$ → $MR = MC$", opt),
         ]
+        _franchise_steps(res, G)
 
     res.steps = _steps(res)
     return res
@@ -386,6 +389,68 @@ def _steps(r: Result) -> list[str]:
                   rf"$Q_{{BE}} = \dfrac{{F}}{{P - c}} {val}$. Each unit earns a margin of $P - c$; "
                   "you need enough units to cover the fixed cost $F$.")
     return st
+
+
+PROFIT_SHARING_DRAWBACKS = [
+    "**Hard to verify.** Revenue is easy to observe and audit; profit depends on costs the franchisee reports.",
+    "**Incentive to inflate costs.** The owner can shift profit into costs (a high salary, family on the payroll, "
+    "perks), shrinking what is shared.",
+    "**Monitoring is expensive.** The franchisor would need to audit every outlet's books.",
+    "**The franchisor carries the operator's inefficiency** and risk: a badly run outlet pays little even with good sales.",
+]
+
+
+def _franchise_steps(r: Result, G: sp.Expr) -> None:
+    """Fill each franchise scenario (parts a, b, c) with its own worked steps and one-line answer."""
+    s, keep = r.share, 1 - r.share
+    fa, fb, fc = r.franchise
+
+    def vals(x):
+        R, C = r.R.subs(Q, x), r.C.subs(Q, x)
+        return dict(P=r.price_at(x), R=R, C=C, fr=s * R, fe=keep * R - C, tot=r.profit.subs(Q, x))
+
+    def totals(v):
+        return (rf"$P = {tex(v['P'])}$, $R = {tex(v['R'])}$, $C = {tex(v['C'])}$. "
+                rf"Franchisor receives ${sp.latex(s)} \times {tex(v['R'])} = {tex(v['fr'])}$; "
+                rf"franchisee nets ${sp.latex(keep)} \times {tex(v['R'])} - {tex(v['C'])} = {tex(v['fe'])}$.")
+
+    def answer(x, v):
+        return (f"Q = {num(x)}, P = {num(v['P'])}. Franchisor gets {num(v['fr'])}, "
+                f"franchisee nets {num(v['fe'])}. Total {num(v['tot'])}.")
+
+    A = vals(fa.opt.x) if fa.opt else None
+    B = vals(fb.opt.x) if fb.opt else None
+    if A:
+        fa.steps = [
+            rf"The franchisor earns $sR(Q) = {sp.latex(s)}\,R(Q)$ and pays none of the costs, so it maximizes revenue.",
+            rf"$\dfrac{{d(sR)}}{{dQ}} = s\cdot MR = 0$ → $MR = {ltx(r.MR)} = 0$ → $Q = {tex(fa.opt.x)}$",
+            totals(A),
+        ]
+        fa.answer = answer(fa.opt.x, A)
+    if B:
+        dG = sp.diff(G, Q)
+        fb.steps = [
+            rf"Franchisee's profit: $\pi_F = (1-s)R - C = {ltx(G)}$",
+            rf"$\pi_F' = (1-s)\,MR - MC = {ltx(dG)} = 0$, i.e. ${sp.latex(keep)}\,MR = MC$ → $Q = {tex(fb.opt.x)}$",
+            totals(B),
+        ]
+        if A:
+            diff = B["tot"] - A["tot"]
+            fb.steps.append(rf"Total profit ${tex(B['tot'])}$ vs ${tex(A['tot'])}$ in part a: "
+                            + (rf"**{num(diff)} higher**." if diff > 0 else rf"{num(-diff)} lower.")
+                            + " The owner restricts output and charges more, because the revenue cut works like a tax on each sale.")
+        fb.answer = answer(fb.opt.x, B)
+    if fc.opt:
+        Cv = vals(fc.opt.x)
+        fc.steps = [
+            r"Franchisor gets $\alpha(R - C)$, franchisee gets $(1-\alpha)(R - C)$. For any $0 < \alpha < 1$ both are "
+            r"maximized where $R - C$ is, so **the conflict disappears**.",
+            rf"$\pi' = MR - MC = {ltx(r.dprofit)} = 0$ → $Q = {tex(fc.opt.x)}$, $P = {tex(Cv['P'])}$, $\pi = {tex(Cv['tot'])}$",
+            rf"$\alpha$ only changes how ${tex(Cv['tot'])}$ is divided ($\alpha = 50\%$ gives each side ${tex(Cv['tot'] / 2)}$), not $Q$ or $P$.",
+            "This is the highest total profit of the three arrangements.",
+        ]
+        fc.answer = (f"Yes, the conflict disappears. Q = {num(fc.opt.x)}, P = {num(Cv['P'])}, "
+                     f"total profit {num(Cv['tot'])}, whatever the split.")
 
 
 # ---------------------------------------------------------------- any function
