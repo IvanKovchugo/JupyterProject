@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Marginal analysis calculator: MR = MC, revenue max, break-even and franchise problems with worked steps.">
+<style>html{color-scheme:light}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Marginal Analysis Workbench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: inputs rail on the left, live answer + chart on the right, worked solution and side tools stacked below. */
+:root{
+  --bg:#eef2f7; --panel:#ffffff; --ink:#15223a; --muted:#56637c; --line:#d6dde8; --grid:#e7ecf3;
+  --accent:#2c56c9; --accent-soft:#e3eafb;
+  --c-rev:#2c56c9; --c-cost:#c95a22; --c-pi:#1d8357; --c-alt:#8549c9;
+  --bad:#b4342b; --good:#1d8357;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Source Sans 3",ui-sans-serif,system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e141f; --panel:#161f2e; --ink:#e5eaf3; --muted:#97a3ba; --line:#28344a; --grid:#212b3c;
+  --accent:#7f9dff; --accent-soft:#1f2b48;
+  --c-rev:#7f9dff; --c-cost:#f08a55; --c-pi:#4cc58c; --c-alt:#b88cf3; --bad:#ff7b70; --good:#4cc58c;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e141f; --panel:#161f2e; --ink:#e5eaf3; --muted:#97a3ba; --line:#28344a; --grid:#212b3c;
+  --accent:#7f9dff; --accent-soft:#1f2b48;
+  --c-rev:#7f9dff; --c-cost:#f08a55; --c-pi:#4cc58c; --c-alt:#b88cf3; --bad:#ff7b70; --good:#4cc58c;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body)}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:28px 48px;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font:600 12px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+h1{font:700 clamp(28px,4.4vw,42px)/1.05 var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font:700 20px/1.2 var(--f-display);margin:0;text-wrap:balance}
+h3{font:600 13px/1.2 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.lede{color:var(--muted);max-width:68ch;margin:0}
+code,.mono{font-family:var(--f-mono);font-size:.9em}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.presets{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.presets span{font:600 12px var(--f-mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-right:4px}
+.chip{font:600 14px var(--f-body);border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 12px;border-radius:999px;cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.grid{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.field{display:flex;flex-direction:column;gap:6px}
+label,.lbl{font-weight:600;font-size:14px}
+input[type=text],input[type=number]{font:15px var(--f-mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%}
+input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{text-align:center;padding:8px 4px;font-size:13px;cursor:pointer;border-left:1px solid var(--line);color:var(--muted)}
+.seg label:first-of-type{border-left:0}
+.seg input:checked+label{background:var(--accent-soft);color:var(--accent)}
+.seg input:focus-visible+label{outline:2px solid var(--accent);outline-offset:-2px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.err{color:var(--bad);font-weight:600;font-size:14px;margin:0}
+.note{font-size:13px;color:var(--muted);border-left:2px solid var(--line);padding-left:10px;margin:0}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:620px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tile .k{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tile .v{font:700 26px/1.1 var(--f-display);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.tile .s{font-size:13px;color:var(--muted)}
+.tile.hl{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.results{display:flex;flex-direction:column;gap:16px;min-width:0}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{font:600 13px var(--f-body);background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:5px 10px;cursor:pointer}
+.tab[aria-pressed="true"]{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.chartbox{overflow-x:auto}
+svg.chart{width:100%;height:auto;display:block;min-width:300px}
+svg.chart text{fill:var(--muted);font:11px var(--f-mono)}
+svg.chart .gridl{stroke:var(--grid);stroke-width:1}
+svg.chart .axis{stroke:var(--muted);stroke-width:1}
+svg.chart .ln{fill:none;stroke-width:2.2;stroke-linejoin:round}
+svg.chart .vl{stroke:var(--muted);stroke-dasharray:4 4;stroke-width:1}
+svg.chart .mk{stroke-width:2;fill:var(--panel)}
+svg.chart .mklab{fill:var(--ink);font-weight:600}
+.s-rev{stroke:var(--c-rev)} .s-cost{stroke:var(--c-cost)} .s-pi{stroke:var(--c-pi)} .s-alt{stroke:var(--c-alt)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin:0;padding:0;list-style:none}
+.legend i{display:inline-block;width:16px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.b-rev{background:var(--c-rev)} .b-cost{background:var(--c-cost)} .b-pi{background:var(--c-pi)} .b-alt{background:var(--c-alt)}
+ol.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px}
+ol.steps li{padding-left:4px}
+ol.steps li::marker{font:600 13px var(--f-mono);color:var(--accent)}
+.eq{display:inline-block;font-family:var(--f-mono);font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 8px;margin:2px 0;overflow-wrap:anywhere}
+.ok{color:var(--good);font-weight:600}.warn{color:var(--bad);font-weight:600}
+.tablebox{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:15px}
+th,td{text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{font:600 12px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);vertical-align:bottom;white-space:normal}
+tr.total td{font-weight:700}
+td.best{color:var(--good)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:20px;align-items:start}
+@media (max-width:860px){.two{grid-template-columns:minmax(0,1fr)}}
+.row3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
+footer{font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.chip,.tab{transition:background .15s,border-color .15s}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Economics of Entrepreneurship · Marginal analysis</div>
+    <h1>Marginal Analysis Workbench</h1>
+    <p class="lede">Type a demand or revenue function and a cost function. The workbench takes the derivatives, solves MR = MC, finds revenue-maximizing and break-even output, and writes out each step so you can check your own working.</p>
+  </header>
+
+  <div class="presets" id="presets"><span>Load a problem</span></div>
+
+  <div class="grid">
+    <form class="panel" id="model" autocomplete="off">
+      <h2>The firm</h2>
+      <div class="field">
+        <span class="lbl" id="modeLbl">What do you know about demand?</span>
+        <div class="seg" role="radiogroup" aria-labelledby="modeLbl">
+          <input type="radio" name="mode" id="m-demand" value="demand" checked><label for="m-demand">Demand P(Q)</label>
+          <input type="radio" name="mode" id="m-revenue" value="revenue"><label for="m-revenue">Revenue R(Q)</label>
+          <input type="radio" name="mode" id="m-price" value="price"><label for="m-price">Fixed price</label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="revIn" id="revLbl">Inverse demand P(Q) =</label>
+        <input type="text" id="revIn" spellcheck="false" value="120 - 0.5Q">
+      </div>
+      <div class="field">
+        <label for="costIn">Total cost C(Q) =</label>
+        <input type="text" id="costIn" spellcheck="false" value="420 + 60Q + Q^2">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="shareIn">Revenue share to franchisor, %</label>
+          <input type="number" id="shareIn" min="0" max="99" step="any" value="0">
+        </div>
+        <div class="field">
+          <label for="capIn">Capacity (max Q)</label>
+          <input type="number" id="capIn" min="0" step="any" placeholder="auto">
+        </div>
+      </div>
+      <p class="hint">Write quantity as <code>Q</code>. Works with <code>0.5Q</code>, <code>Q^2</code>, <code>Q/800</code>, <code>sqrt(Q)</code>, <code>ln(Q)</code>, <code>e^(0.1Q)</code>. Decimal commas are fine.</p>
+      <p class="err" id="err" hidden></p>
+      <p class="note" id="presetNote" hidden></p>
+    </form>
+
+    <div class="results">
+      <div class="tiles" id="tiles"></div>
+      <div class="panel">
+        <div class="tabs" role="group" aria-label="Chart">
+          <button type="button" class="tab" data-tab="levels" aria-pressed="true">Revenue, cost, profit</button>
+          <button type="button" class="tab" data-tab="marginal" aria-pressed="false">MR and MC</button>
+        </div>
+        <div class="chartbox"><svg class="chart" id="chart" viewBox="0 0 640 300" role="img" aria-label="Chart of the firm's functions"></svg></div>
+        <ul class="legend" id="legend"></ul>
+      </div>
+    </div>
+  </div>
+
+  <section class="panel">
+    <h2>Worked solution</h2>
+    <ol class="steps" id="steps"></ol>
+  </section>
+
+  <section class="panel" id="franP" hidden>
+    <h2>Who sets price and quantity?</h2>
+    <p class="hint" id="franLede"></p>
+    <div class="tablebox"><table id="franT"></table></div>
+    <div id="franNotes" style="display:flex;flex-direction:column;gap:8px"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Any-function optimizer</h2>
+    <p class="hint">For anything that isn't a revenue/cost setup: a utility function, an average cost curve, a production function. Use any single variable letter.</p>
+    <div class="two">
+      <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+        <div class="row3">
+          <div class="field"><label for="ffIn">f =</label><input type="text" id="ffIn" spellcheck="false" value="x^3 - 6x^2 + 9x + 2"></div>
+          <div class="field"><label for="ffA">From</label><input type="number" id="ffA" step="any" value="0"></div>
+          <div class="field"><label for="ffB">To</label><input type="number" id="ffB" step="any" value="5"></div>
+        </div>
+        <p class="err" id="ffErr" hidden></p>
+        <div id="ffOut" style="display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+      <div class="chartbox"><svg class="chart" id="ffChart" viewBox="0 0 640 300" role="img" aria-label="Chart of f"></svg></div>
+    </div>
+  </section>
+
+  <footer>Derivatives are symbolic (math.js). Optimum, break-even and critical points are found numerically on [0, capacity] and refined to about 1e-10, then rounded to 4 decimals. Source and the Python (exact-answer) version: <a href="https://github.com/IvanKovchugo/JupyterProject" style="color:var(--accent)">github.com/IvanKovchugo/JupyterProject</a>.</footer>
+</div>
+
+<script>
+(function(){
+const M = window.math;
+const $ = id => document.getElementById(id);
+if(!M){ $('err').hidden=false; $('err').textContent='The math library did not load. Check your connection and reload.'; return; }
+
+const PRESETS = [
+  {id:'p2', label:'Problem 2', mode:'revenue', rev:'170Q - 20Q^2', cost:'100 + 38Q', share:0,
+   note:'Problem 2 gives only revenue. The cost C = 100 + 38Q is the microchip example from the textbook chapter; change it if your notes use a different one.'},
+  {id:'p4a', label:'4a', mode:'demand', rev:'120 - 0.5Q', cost:'420 + 60Q + Q^2', share:0},
+  {id:'p4b', label:'4b', mode:'price', rev:'120', cost:'420 + 60Q + Q^2', share:0},
+  {id:'p5a', label:'5a', mode:'price', rev:'120', cost:'420 + 60Q', share:0,
+   note:'With a fixed price and linear cost, profit rises forever, so set a capacity to see the corner solution. The break-even formula is in step 6.'},
+  {id:'p14', label:'Problem 14', mode:'demand', rev:'3 - Q/800', cost:'0.8Q', share:20,
+   note:'Burger Queen: 20% of revenue goes to BQ, the franchisee pays $0.80 per Slopper. The comparison table below answers parts a, b and c.'},
+];
+
+/* ---------- parsing & display ---------- */
+function norm(s, upQ){
+  s = String(s).trim().replace(/[−–—]/g,'-').replace(/(\d),(\d)/g,'$1.$2').replace(/[×·]/g,'*').replace(/\bln\s*\(/g,'log(');
+  if(upQ) s = s.replace(/\bq\b/g,'Q');
+  return s;
+}
+const known = n => M[n] !== undefined;
+function parseQ(str, what){
+  if(!String(str).trim()) throw new Error(`Enter ${what}.`);
+  let node;
+  try{ node = M.parse(norm(str,true)); }catch(e){ throw new Error(`Couldn't read ${what}. Check for a missing operator or bracket.`); }
+  const bad = node.filter(n=>n.isSymbolNode && n.name!=='Q' && !known(n.name));
+  if(bad.length) throw new Error(`${cap(what)} uses "${bad[0].name}". Write quantity as Q.`);
+  return node;
+}
+const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+const SUP = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+const sup = k => String(k).split('').map(c=>SUP[c]).join('');
+function fmt(x, d=4){
+  if(x===null || x===undefined || !isFinite(x)) return '—';
+  const p = Math.pow(10,d); let r = Math.round(x*p)/p; if(Object.is(r,-0)||r===0) r=0;
+  return r.toLocaleString('en-US',{maximumFractionDigits:d}).replace('-','−');
+}
+function coefStr(a){
+  const s = String(+a.toPrecision(10));
+  const dec = (s.split('.')[1]||'').length;
+  if(dec>3 && a<1){ const inv = 1/a, ri = Math.round(inv); if(Math.abs(inv-ri)<1e-7 && ri<=1e7) return {frac:ri}; }
+  return {txt: fmt(a,6).replace('−','')};
+}
+function poly(c, v){
+  let s='';
+  for(let k=c.length-1;k>=0;k--){
+    let a = +c[k]; if(!isFinite(a) || Math.abs(a)<1e-12) continue;
+    const neg = a<0; a = Math.abs(a);
+    let t;
+    if(k===0) t = fmt(a,6).replace('−','');
+    else{
+      const vp = v + (k>1?sup(k):'');
+      const cs = coefStr(a);
+      t = cs.frac ? `${vp}/${cs.frac}` : (Math.abs(a-1)<1e-12 ? vp : cs.txt + vp);
+    }
+    s += s ? (neg?' − ':' + ')+t : (neg?'−':'')+t;
+  }
+  return s || '0';
+}
+function tidy(s){
+  return s.replace(/(\d)\s*\*\s*([A-Za-z(])/g,'$1$2').replace(/\s*\^\s*2\b/g,'²').replace(/\s*\^\s*3\b/g,'³')
+          .replace(/\s\*\s/g,'·').replace(/ - /g,' − ').replace(/^-/,'−');
+}
+function show(node, v='Q'){
+  try{
+    if(!node.filter(n=>n.isSymbolNode && n.name===v).length) return fmt(node.evaluate(),6);
+  }catch(e){}
+  try{
+    const r = M.rationalize(node, {}, true);
+    let den = 1;
+    if(r.denominator){
+      if(r.denominator.filter(n=>n.isSymbolNode).length) throw 0;
+      den = r.denominator.evaluate();
+    }
+    if(r.coefficients && r.coefficients.length) return poly(r.coefficients.map(c=>c/den), v);
+  }catch(e){}
+  try{ return tidy(M.simplify(node).toString()); }catch(e){ return tidy(node.toString()); }
+}
+function fn(node, v='Q'){
+  const c = node.compile();
+  return x => { try{ const r = c.evaluate({[v]:x}); if(typeof r==='number') return r;
+    if(r && typeof r.re==='number' && Math.abs(r.im)<1e-12) return r.re; return NaN; }catch(e){ return NaN; } };
+}
+const D = (node, v='Q') => M.derivative(node, v);
+
+/* ---------- numerics ---------- */
+function bisect(g,a,b,ga){
+  for(let k=0;k<200;k++){ const m=(a+b)/2, gm=g(m); if(gm===0) return m; if(ga*gm<0) b=m; else {a=m; ga=gm;} if(b-a<1e-13*Math.max(1,Math.abs(a))) break; }
+  return (a+b)/2;
+}
+function snap(x){ const r = Math.round(x*1e6)/1e6; return Math.abs(x-r)<1e-8 ? r : x; }
+function roots(g,a,b,n=4000){
+  const out=[]; const h=(b-a)/n; let x0=a, g0=g(a);
+  if(g0===0) out.push(a);
+  for(let i=1;i<=n;i++){
+    const x1=a+h*i, g1=g(x1);
+    if(isFinite(g0)&&isFinite(g1)){
+      if(g1===0) out.push(x1);
+      else if(g0!==0 && g0*g1<0) out.push(bisect(g,x0,x1,g0));
+    }
+    x0=x1; g0=g1;
+  }
+  const s = out.map(snap).sort((p,q)=>p-q), d=[];
+  for(const x of s) if(!d.length || Math.abs(x-d[d.length-1])>1e-7*Math.max(1,Math.abs(x))) d.push(x);
+  return d;
+}
+function firstPosRoot(g){
+  for(const L of [10,100,1e3,1e4,1e5,1e6]){ const r = roots(g,0,L,3000).filter(x=>x>1e-9); if(r.length) return r[0]; }
+  return null;
+}
+function argmax(F, dF, a, b){
+  const crit = roots(dF,a,b);
+  let best=null;
+  for(const x of [a,b,...crit]){ const y=F(x); if(isFinite(y) && (!best || y>best.y+1e-12)) best={x,y}; }
+  if(!best) return null;
+  best.at = Math.abs(best.x-a)<1e-9 ? 'lower' : Math.abs(best.x-b)<1e-9 ? 'upper' : 'interior';
+  return best;
+}
+
+/* ---------- chart ---------- */
+function niceTicks(a,b,n=5){
+  const span=b-a; if(!(span>0)) return [a];
+  const raw=span/n, p=Math.pow(10,Math.floor(Math.log10(raw))), e=raw/p;
+  const step=(e<1.5?1:e<3?2:e<7?5:10)*p, t=[];
+  for(let v=Math.ceil(a/step)*step; v<=b+step*1e-9; v+=step) t.push(+v.toPrecision(12));
+  return t;
+}
+function short(v){
+  const a=Math.abs(v);
+  if(a>=1e6) return fmt(v/1e6,2)+'M';
+  if(a>=1e4) return fmt(v/1e3,1)+'k';
+  return fmt(v,a<1?3:a<10?2:0);
+}
+function drawChart(svg, o){
+  const W=640,H=300,m={l:58,r:18,t:16,b:38};
+  const pw=W-m.l-m.r, ph=H-m.t-m.b, N=260;
+  const data = o.series.map(s=>{ const pts=[]; for(let i=0;i<=N;i++){ const x=o.x0+(o.x1-o.x0)*i/N; pts.push([x,s.f(x)]); } return pts; });
+  let ys = [0]; data.forEach(p=>p.forEach(([,y])=>{ if(isFinite(y)) ys.push(y); }));
+  (o.markers||[]).forEach(mk=>isFinite(mk.y)&&ys.push(mk.y));
+  ys.sort((a,b)=>a-b);
+  let lo=ys[0], hi=ys[ys.length-1];
+  if(ys.length>40){ const q=k=>ys[Math.floor(k*(ys.length-1))]; const qlo=q(.02), qhi=q(.98); const sp=qhi-qlo||1;
+    if(hi-qhi>3*sp) hi=qhi+.15*sp; if(qlo-lo>3*sp) lo=qlo-.15*sp; }
+  if(hi===lo){ hi+=1; lo-=1; }
+  const pad=(hi-lo)*.07; lo-=lo<0||lo>0?pad:0; hi+=pad;
+  if(ys[0]>=0 && lo<0) lo=Math.min(0,ys[0]);
+  const X=x=>m.l+(x-o.x0)/(o.x1-o.x0)*pw, Y=y=>m.t+(hi-y)/(hi-lo)*ph;
+  const id = svg.id+'-clip';
+  let h = `<defs><clipPath id="${id}"><rect x="${m.l}" y="${m.t}" width="${pw}" height="${ph}"/></clipPath></defs>`;
+  const yt=niceTicks(lo,hi,5), xt=niceTicks(o.x0,o.x1,6);
+  yt.forEach(v=>{ h+=`<line class="gridl" x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${m.l-8}" y="${Y(v)+4}" text-anchor="end">${short(v)}</text>`; });
+  xt.forEach(v=>{ h+=`<line class="gridl" y1="${m.t}" y2="${H-m.b}" x1="${X(v)}" x2="${X(v)}"/><text x="${X(v)}" y="${H-m.b+16}" text-anchor="middle">${short(v)}</text>`; });
+  if(lo<0&&hi>0) h+=`<line class="axis" x1="${m.l}" x2="${W-m.r}" y1="${Y(0)}" y2="${Y(0)}"/>`;
+  h+=`<line class="axis" x1="${m.l}" x2="${m.l}" y1="${m.t}" y2="${H-m.b}"/><line class="axis" x1="${m.l}" x2="${W-m.r}" y1="${H-m.b}" y2="${H-m.b}"/>`;
+  h+=`<text x="${W-m.r}" y="${H-6}" text-anchor="end">${o.xlabel||'Q'}</text>`;
+  h+=`<g clip-path="url(#${id})">`;
+  (o.vlines||[]).forEach(x=>{ if(x>=o.x0&&x<=o.x1) h+=`<line class="vl" x1="${X(x)}" x2="${X(x)}" y1="${m.t}" y2="${H-m.b}"/>`; });
+  data.forEach((pts,i)=>{
+    let d='', pen=false;
+    pts.forEach(([x,y])=>{ if(!isFinite(y)){pen=false;return;} const yy=Math.max(-1e4,Math.min(1e4,Y(y))); d+=(pen?'L':'M')+X(x).toFixed(1)+' '+yy.toFixed(1); pen=true; });
+    h+=`<path class="ln ${o.series[i].cls}" d="${d}"${o.series[i].dash?' stroke-dasharray="6 4"':''}/>`;
+  });
+  h+='</g>';
+  (o.markers||[]).forEach(mk=>{
+    if(!isFinite(mk.y)||mk.x<o.x0||mk.x>o.x1||mk.y<lo||mk.y>hi) return;
+    const cx=X(mk.x), cy=Y(mk.y), right = cx < m.l+pw*0.7;
+    h+=`<circle class="mk ${mk.cls}" cx="${cx}" cy="${cy}" r="4.5"/>`;
+    if(mk.label) h+=`<text class="mklab" x="${cx+(right?8:-8)}" y="${cy-8}" text-anchor="${right?'start':'end'}">${mk.label}</text>`;
+  });
+  svg.innerHTML=h;
+}
+
+/* ---------- state ---------- */
+let mode='demand', tab='levels', activePreset='p4a';
+const LS='maw-v1';
+function save(){ try{ localStorage.setItem(LS, JSON.stringify({mode, rev:$('revIn').value, cost:$('costIn').value, share:$('shareIn').value, cap:$('capIn').value, ff:$('ffIn').value, a:$('ffA').value, b:$('ffB').value})); }catch(e){} }
+function load(){ try{ const s=JSON.parse(localStorage.getItem(LS)||'null'); if(!s) return false;
+  setMode(s.mode); $('revIn').value=s.rev; $('costIn').value=s.cost; $('shareIn').value=s.share; $('capIn').value=s.cap||'';
+  if(s.ff){ $('ffIn').value=s.ff; $('ffA').value=s.a; $('ffB').value=s.b; } activePreset=null; return true; }catch(e){ return false; } }
+
+function setMode(m){
+  mode=m; $('m-'+m).checked=true;
+  $('revLbl').textContent = m==='demand' ? 'Inverse demand P(Q) =' : m==='revenue' ? 'Total revenue R(Q) =' : 'Market price P =';
+}
+
+/* ---------- main model ---------- */
+function build(){
+  const share = Math.min(99, Math.max(0, parseFloat(String($('shareIn').value).replace(',','.'))||0))/100;
+  const capRaw = parseFloat(String($('capIn').value).replace(',','.'));
+  const capSet = isFinite(capRaw) && capRaw>0;
+  let Pn, Rn;
+  if(mode==='demand'){ Pn=parseQ($('revIn').value,'the demand curve'); Rn=M.parse(`(${Pn.toString()})*Q`); }
+  else if(mode==='revenue'){ Rn=parseQ($('revIn').value,'the revenue function'); Pn=M.parse(`(${Rn.toString()})/Q`); }
+  else{
+    Pn=parseQ($('revIn').value,'the price');
+    if(Pn.filter(n=>n.isSymbolNode&&n.name==='Q').length) throw new Error('A fixed price can\'t depend on Q. Pick "Demand P(Q)" instead.');
+    Rn=M.parse(`(${Pn.toString()})*Q`);
+  }
+  const Cn=parseQ($('costIn').value,'the cost function');
+  const PiN=M.parse(`(${Rn.toString()}) - (${Cn.toString()})`);
+  const MRn=D(Rn), MCn=D(Cn), dPiN=D(PiN), d2PiN=D(dPiN);
+  const Pf0=fn(Pn);
+  const f = { R:fn(Rn), C:fn(Cn), Pi:fn(PiN), MR:fn(MRn), MC:fn(MCn), dPi:fn(dPiN), d2Pi:fn(d2PiN),
+              P: x => mode==='revenue' && x<1e-9 ? Pf0(1e-9) : Pf0(x) };
+  return {share, capSet, capRaw, Pn, Rn, Cn, PiN, MRn, MCn, dPiN, d2PiN, f};
+}
+
+function solve(m){
+  const f=m.f;
+  let Qmax, demandEnd=null;
+  if(mode==='demand') demandEnd=firstPosRoot(f.P);
+  if(mode==='revenue') demandEnd=firstPosRoot(f.R);
+  if(m.capSet) Qmax=m.capRaw;
+  else if(demandEnd) Qmax=demandEnd;
+  else{
+    const c=firstPosRoot(f.dPi);
+    if(c) Qmax=2*c;
+    else{ const be=firstPosRoot(f.Pi); Qmax = be ? Math.max(3*be,10) : 100; }
+  }
+  const opt=argmax(f.Pi,f.dPi,0,Qmax);
+  const rev=argmax(f.R,f.MR,0,Qmax);
+  const be=roots(f.Pi,0,Qmax);
+  const unbounded = opt && opt.at==='upper' && f.dPi(Qmax)>1e-12;
+  const revUnbounded = rev && rev.at==='upper' && f.MR(Qmax)>1e-12;
+  return {Qmax, demandEnd, opt, rev, be, unbounded, revUnbounded};
+}
+
+function tile(k,v,s,hl){ return `<div class="tile${hl?' hl':''}"><span class="k">${k}</span><span class="v">${v}</span><span class="s">${s||''}</span></div>`; }
+const eq = s => `<span class="eq">${s}</span>`;
+
+function render(){
+  save();
+  $('err').hidden=true;
+  let m,s;
+  try{ m=build(); s=solve(m); }catch(e){
+    $('err').textContent=e.message; $('err').hidden=false; return;
+  }
+  const f=m.f, o=s.opt, Q=o?o.x:NaN;
+  const P=f.P(Q), lin = mode==='price' && Math.abs(f.MC(0)-f.MC(7.3))<1e-9 && Math.abs(f.MC(0)-f.MC(1234))<1e-9;
+  const capWord = m.capSet ? 'capacity' : 'the chart limit';
+
+  // tiles
+  let t='';
+  t+=tile('Profit-max Q*', s.unbounded && !m.capSet ? '∞' : fmt(Q), s.unbounded ? (m.capSet?'corner: at capacity':'no interior maximum') : 'where MR = MC', true);
+  t+=tile('Price P*', fmt(P), mode==='price'?'fixed by the market':'from demand at Q*');
+  t+=tile('Max profit π*', s.unbounded && !m.capSet ? '∞' : fmt(o?o.y:NaN), o && o.y<0 ? 'a loss: minimizes losses' : 'R − C at Q*');
+  if(mode==='price') t+=tile('Break-even Q', s.be.length? s.be.map(x=>fmt(x)).join(', ') : 'none', 'where π = 0');
+  else t+=tile('Revenue-max Q', s.revUnbounded?'∞':fmt(s.rev.x), 'where MR = 0');
+  $('tiles').innerHTML=t;
+
+  // steps
+  const st=[];
+  const Rs=show(m.Rn), Cs=show(m.Cn);
+  if(mode==='demand') st.push(`Revenue is price times quantity: ${eq('R(Q) = P(Q)·Q = '+Rs)}`);
+  else if(mode==='revenue') st.push(`Revenue is given: ${eq('R(Q) = '+Rs)}, so the demand curve is ${eq('P = R/Q = '+show(m.Pn))}`);
+  else st.push(`The firm is a price taker at ${eq('P = '+show(m.Pn))}, so ${eq('R(Q) = '+Rs)}`);
+  st.push(`Marginal revenue is the derivative of revenue: ${eq('MR = dR/dQ = '+show(m.MRn))}${mode==='price'?' (MR equals the price)':''}`);
+  st.push(`Marginal cost is the derivative of cost ${eq('C(Q) = '+Cs)}: ${eq('MC = dC/dQ = '+show(m.MCn))}`);
+  st.push(`Profit and marginal profit: ${eq('π(Q) = R − C = '+show(m.PiN))} and ${eq('π′(Q) = MR − MC = '+show(m.dPiN))}`);
+  if(s.unbounded){
+    st.push(`${eq('π′(Q) = '+show(m.dPiN))} never reaches zero on [0, ${fmt(s.Qmax)}]. <span class="warn">MR stays above MC</span>, so every extra unit adds profit and the MR = MC rule has no solution. Modified rule: keep producing while P &gt; MC, i.e. go to ${m.capSet?'capacity':'the largest output you can'}. ${m.capSet?`At capacity Q = ${fmt(Q)}: P = ${fmt(P)}, π = ${fmt(o.y)}.`:'Enter a capacity to get a number.'}`);
+  } else if(o){
+    if(o.at==='interior'){
+      const d2=f.d2Pi(Q);
+      st.push(`Set ${eq('π′(Q) = 0')} (same as ${eq('MR = MC')}) and solve: ${eq('Q* = '+fmt(Q))}. Check: MR(Q*) = ${fmt(f.MR(Q))}, MC(Q*) = ${fmt(f.MC(Q))}.`);
+      st.push(`Second-order condition: ${eq('π″(Q) = '+show(m.d2PiN))}, at Q* it is ${fmt(d2)} ${d2<0?'<span class="ok">&lt; 0, so this is a maximum</span>':'<span class="warn">≥ 0, check the endpoints</span>'}.`);
+    } else {
+      st.push(`π′(Q) = 0 has no interior maximum on [0, ${fmt(s.Qmax)}], so profit peaks at the ${o.at==='lower'?'lower end (Q = 0: shut down)':'upper end, '+capWord}.`);
+    }
+    st.push(`At the optimum: ${eq('P* = '+fmt(P))}, ${eq('R = '+fmt(f.R(Q)))}, ${eq('C = '+fmt(f.C(Q)))}, ${eq('π* = '+fmt(o.y))}${o.y<0?'. Profit is negative: this output minimizes the loss; in the long run the firm would exit.':''}`);
+  }
+  if(mode!=='price' && s.rev){
+    if(s.revUnbounded) st.push(`Revenue keeps rising up to ${capWord}, so there is no interior revenue maximum.`);
+    else{
+      const Qr=s.rev.x;
+      st.push(`Revenue maximum: set ${eq('MR = '+show(m.MRn)+' = 0')} → ${eq('Q = '+fmt(Qr))}, P = ${fmt(f.P(Qr))}, R = ${fmt(s.rev.y)}.`);
+      if(o && !s.unbounded){
+        const mcR=f.MC(Qr);
+        if(Qr>Q+1e-9) st.push(`Revenue-max output ${fmt(Qr)} <span class="ok">is greater than</span> profit-max output ${fmt(Q)}. At Q = ${fmt(Qr)} the last unit adds nothing to revenue (MR = 0) but still costs MC = ${fmt(mcR)} to make. A profit-maximizer stops earlier, where MR = MC &gt; 0. Profit at the revenue maximum is ${fmt(f.Pi(Qr))}, below π* = ${fmt(o.y)}.`);
+        else if(Math.abs(Qr-Q)<1e-9) st.push(`Revenue-max and profit-max output coincide, which happens when MC = 0 at the optimum.`);
+        else st.push(`Here revenue-max output is below profit-max output, which only happens when MC is negative somewhere. Check the cost function.`);
+      }
+    }
+  }
+  if(s.be.length) st.push(`Break-even (π = 0) at ${eq('Q = '+s.be.map(x=>fmt(x)).join(' and '))}${s.be.length===2?': the firm makes money between these outputs':''}.`);
+  else st.push(`π(Q) never crosses zero on [0, ${fmt(s.Qmax)}]${o&&o.y<0?': the firm cannot break even':''}.`);
+  if(lin){
+    const F=f.C(0), c=f.MC(0), Pv=f.P(1);
+    st.push(`General break-even with fixed price and linear cost: ${eq('π = PQ − F − cQ = 0')} → ${eq('Q_BE = F / (P − c)')} = ${fmt(F)} / (${fmt(Pv)} − ${fmt(c)}) = ${fmt(Pv>c?F/(Pv-c):NaN)}. Each unit contributes a margin of P − c; you need enough units to cover the fixed cost F.`);
+  }
+  $('steps').innerHTML=st.map(x=>`<li>${x}</li>`).join('');
+
+  // franchise
+  renderFranchise(m,s);
+
+  // chart
+  const xmax = s.Qmax;
+  let series, markers=[], vlines=[], leg;
+  if(tab==='levels'){
+    series=[{f:f.R,cls:'s-rev'},{f:f.C,cls:'s-cost'},{f:f.Pi,cls:'s-pi'}];
+    leg=[['b-rev','Revenue R'],['b-cost','Cost C'],['b-pi','Profit π']];
+    if(o && (!s.unbounded||m.capSet)){ markers.push({x:Q,y:o.y,cls:'s-pi',label:`π* at Q=${fmt(Q,2)}`}); vlines.push(Q); }
+    if(mode!=='price' && s.rev && !s.revUnbounded) markers.push({x:s.rev.x,y:s.rev.y,cls:'s-rev',label:`max R at Q=${fmt(s.rev.x,2)}`});
+    s.be.forEach(x=>markers.push({x,y:f.R(x),cls:'s-cost',label:`BE ${fmt(x,2)}`}));
+  } else {
+    series=[{f:f.MR,cls:'s-rev'},{f:f.MC,cls:'s-cost'}];
+    leg=[['b-rev','MR'],['b-cost','MC']];
+    if(mode!=='price') { series.push({f:f.P,cls:'s-rev',dash:true}); leg.push(['b-rev','Demand P (dashed)']); }
+    if(m.share>0){ const k=1-m.share; series.push({f:x=>k*f.MR(x),cls:'s-alt'}); leg.push(['b-alt',`Franchisee's MR = ${fmt(k,2)}·MR`]); }
+    if(o && o.at==='interior'){ markers.push({x:Q,y:f.MC(Q),cls:'s-cost',label:`MR = MC at Q=${fmt(Q,2)}`}); vlines.push(Q); }
+  }
+  drawChart($('chart'),{x0:0,x1:xmax,series,markers,vlines});
+  $('legend').innerHTML=leg.map(([c,l])=>`<li><i class="${c}"></i>${l}</li>`).join('');
+}
+
+function renderFranchise(m,s){
+  const box=$('franP');
+  if(!(m.share>0)){ box.hidden=true; return; }
+  box.hidden=false;
+  const f=m.f, k=1-m.share, a=0, b=s.Qmax;
+  const G=x=>k*f.R(x)-f.C(x), dG=x=>k*f.MR(x)-f.MC(x);
+  const sc=[
+    {h:'Franchisor sets it', sub:'max its take sR → MR = 0', r:argmax(f.R,f.MR,a,b)},
+    {h:'Franchisee sets it', sub:`max (1−s)R − C → ${fmt(k,2)}·MR = MC`, r:argmax(G,dG,a,b)},
+    {h:'Joint / profit sharing', sub:'max R − C → MR = MC', r:s.opt},
+  ];
+  const rows=[
+    ['Quantity Q', r=>r.x],
+    ['Price P', r=>f.P(r.x)],
+    ['Revenue R', r=>f.R(r.x)],
+    ['Franchisee costs C', r=>f.C(r.x)],
+    [`Franchisor receives (${fmt(m.share*100,2)}% of R)`, r=>m.share*f.R(r.x)],
+    ['Franchisee net profit', r=>G(r.x)],
+    ['Total profit (both parties)', r=>f.Pi(r.x)],
+  ];
+  const tot = sc.map(c=>c.r?f.Pi(c.r.x):-Infinity), best=Math.max(...tot);
+  let h='<thead><tr><th></th>'+sc.map(c=>`<th>${c.h}<br><span style="text-transform:none;letter-spacing:0;font-weight:400">${c.sub}</span></th>`).join('')+'</tr></thead><tbody>';
+  rows.forEach(([lab,g],i)=>{
+    const last=i===rows.length-1;
+    h+=`<tr${last?' class="total"':''}><td>${lab}</td>`+sc.map((c,j)=>`<td${last&&Math.abs(tot[j]-best)<1e-9?' class="best"':''}>${c.r?fmt(g(c.r)):'—'}</td>`).join('')+'</tr>';
+  });
+  $('franT').innerHTML=h+'</tbody>';
+  $('franLede').textContent=`The franchisor takes s = ${fmt(m.share*100,2)}% of revenue; the franchisee pays all of C(Q). Each party prefers a different output.`;
+  const r0=sc[0].r, r1=sc[1].r;
+  $('franNotes').innerHTML=[
+    `The franchisor wants maximum revenue, so it pushes output to where MR = 0 and ignores the franchisee's costs.`,
+    `The franchisee keeps only ${fmt(k*100,2)}¢ of each extra revenue dollar, so it stops where ${fmt(k,2)}·MR = MC: output ${r1&&r0&&r1.x<r0.x?'lower':'different'}, price higher. Total profit ${fmt(r1?f.Pi(r1.x):NaN)} vs ${fmt(r0?f.Pi(r0.x):NaN)} when the franchisor sets it.`,
+    `Profit sharing: if the franchisor gets any share α of R − C, each side maximizes α(R − C) or (1 − α)(R − C), both maximized where MR = MC. The split does not change Q or P. Total profit is the highest possible, ${fmt(s.opt?s.opt.y:NaN)}.`,
+    `Why it is rare: profit is easy to manipulate and costly to audit (the franchisee can inflate costs or pay itself a salary), while revenue is simple to verify. Profit sharing also exposes the franchisor to the operator's cost inefficiency.`
+  ].map(x=>`<p class="note">${x}</p>`).join('');
+}
+
+/* ---------- free-form optimizer ---------- */
+function renderFree(){
+  save();
+  const err=$('ffErr'), out=$('ffOut'); err.hidden=true;
+  try{
+    const raw=norm($('ffIn').value,false);
+    if(!raw) throw new Error('Enter a function.');
+    let node; try{ node=M.parse(raw); }catch(e){ throw new Error('Couldn\'t read the function. Check for a missing operator or bracket.'); }
+    const vars=[...new Set(node.filter(n=>n.isSymbolNode && !known(n.name)).map(n=>n.name))];
+    if(vars.length>1) throw new Error(`Use one variable only. Found: ${vars.join(', ')}.`);
+    const v=vars[0]||'x';
+    let a=parseFloat(String($('ffA').value).replace(',','.')), b=parseFloat(String($('ffB').value).replace(',','.'));
+    if(!isFinite(a)) a=-10; if(!isFinite(b)) b=10; if(b<=a) throw new Error('"To" must be larger than "From".');
+    const d1=D(node,v), d2=D(d1,v), F=fn(node,v), F1=fn(d1,v), F2=fn(d2,v);
+    const crit=roots(F1,a,b);
+    let mx=null, mn=null;
+    for(const x of [a,b,...crit]){ const y=F(x); if(!isFinite(y)) continue; if(!mx||y>mx.y) mx={x,y}; if(!mn||y<mn.y) mn={x,y}; }
+    const cls=x=>{ const s2=F2(x); return s2<-1e-10?'local max':s2>1e-10?'local min':'inflection / flat (f″ = 0)'; };
+    let h=`<div>${eq(`f′(${v}) = ${show(d1,v)}`)}<br>${eq(`f″(${v}) = ${show(d2,v)}`)}</div>`;
+    h+=`<div class="tablebox"><table><thead><tr><th>Critical point ${v}</th><th>f(${v})</th><th>f″(${v})</th><th>Type</th></tr></thead><tbody>`;
+    h+= crit.length ? crit.map(x=>`<tr><td>${fmt(x)}</td><td>${fmt(F(x))}</td><td>${fmt(F2(x))}</td><td>${cls(x)}</td></tr>`).join('') : `<tr><td colspan="4" style="text-align:left">No point with f′ = 0 between ${fmt(a)} and ${fmt(b)}.</td></tr>`;
+    h+='</tbody></table></div>';
+    h+=`<p class="hint">On [${fmt(a)}, ${fmt(b)}]: global max f = <b>${fmt(mx&&mx.y)}</b> at ${v} = ${fmt(mx&&mx.x)}; global min f = <b>${fmt(mn&&mn.y)}</b> at ${v} = ${fmt(mn&&mn.x)}.</p>`;
+    out.innerHTML=h;
+    const markers=crit.map(x=>({x,y:F(x),cls:'s-alt',label:`${v}=${fmt(x,2)}`}));
+    drawChart($('ffChart'),{x0:a,x1:b,xlabel:v,series:[{f:F,cls:'s-alt'},{f:F1,cls:'s-rev',dash:true}],markers,vlines:crit});
+  }catch(e){ err.textContent=e.message; err.hidden=false; }
+}
+
+/* ---------- wiring ---------- */
+function applyPreset(p){
+  activePreset=p.id; setMode(p.mode);
+  $('revIn').value=p.rev; $('costIn').value=p.cost; $('shareIn').value=p.share; $('capIn').value='';
+  $('presetNote').hidden=!p.note; $('presetNote').textContent=p.note||'';
+  markPresets(); render();
+}
+function markPresets(){ document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed', String(c.dataset.id===activePreset))); }
+const pbox=$('presets');
+PRESETS.forEach(p=>{ const b=document.createElement('button'); b.type='button'; b.className='chip'; b.dataset.id=p.id; b.textContent=p.label; b.onclick=()=>applyPreset(p); pbox.appendChild(b); });
+
+let tmr; const later=fnc=>{ clearTimeout(tmr); tmr=setTimeout(fnc,180); };
+$('model').addEventListener('submit',e=>e.preventDefault());
+['revIn','costIn','shareIn','capIn'].forEach(id=>$(id).addEventListener('input',()=>{ activePreset=null; markPresets(); $('presetNote').hidden=true; later(render); }));
+document.querySelectorAll('input[name=mode]').forEach(r=>r.addEventListener('change',()=>{ setMode(r.value); activePreset=null; markPresets(); render(); }));
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{ tab=b.dataset.tab; document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-pressed',String(x===b))); render(); }));
+['ffIn','ffA','ffB'].forEach(id=>$(id).addEventListener('input',()=>later(renderFree)));
+
+if(!load()) { applyPreset(PRESETS[1]); } else { markPresets(); render(); }
+renderFree();
+})();
+</script>
+</body>
+</html>

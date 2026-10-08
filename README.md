@@ -2,6 +2,9 @@
 
 ## Marginal Analysis Workbench
 
+**Use it online:** https://ivankovchugo.github.io/JupyterProject/ (JavaScript version, instant, works on phones).
+The Python/Streamlit version in `Economics_of_Entrapreneurship/app.py` gives exact symbolic answers (e.g. `20 − 2√30`).
+
 A calculator for marginal analysis problems. Enter a demand curve (or revenue function, or fixed market price) and a cost function. The workbench:
 
 - takes the derivatives symbolically (MR, MC, π′, π″)
