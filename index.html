@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Marginal analysis calculator: MR = MC, revenue max, break-even and franchise problems with worked steps.">
 <style>html{color-scheme:light}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
-<title>Marginal Analysis Workbench</title>
+<title>Economics Workbench</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -90,7 +90,7 @@ svg.chart .lead{stroke:var(--muted);stroke-width:1;opacity:.6}
 .s-rev{stroke:var(--c-rev)} .s-cost{stroke:var(--c-cost)} .s-pi{stroke:var(--c-pi)} .s-alt{stroke:var(--c-alt)}
 .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--muted);margin:0;padding:0;list-style:none}
 .legend i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
-.b-rev{background:var(--c-rev)} .b-cost{background:var(--c-cost)} .b-pi{background:var(--c-pi)} .b-alt{background:var(--c-alt)}
+.b-dwl{background:var(--bad)} .b-rev{background:var(--c-rev)} .b-cost{background:var(--c-cost)} .b-pi{background:var(--c-pi)} .b-alt{background:var(--c-alt)}
 .parts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 @media (max-width:860px){.parts{grid-template-columns:minmax(0,1fr)}}
 .part{border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
@@ -99,6 +99,25 @@ svg.chart .lead{stroke:var(--muted);stroke-width:1;opacity:.6}
 .part .q{font-size:14px;color:var(--muted);margin:0;font-style:italic}
 .part ol.steps{gap:8px;font-size:15px}
 .part .ans{margin:0;font-weight:600;color:var(--head);background:var(--mint);border-radius:10px;padding:8px 12px}
+.pagenav{display:flex;gap:4px;flex-wrap:wrap;background:var(--mint);border-radius:12px;padding:4px;align-self:flex-start;max-width:100%}
+.pagenav button{font:600 15px var(--f-body);border:0;background:transparent;color:var(--muted);padding:8px 16px;border-radius:9px;cursor:pointer}
+.pagenav button[aria-selected="true"]{background:var(--panel);color:var(--head);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.page{display:flex;flex-direction:column;gap:22px}
+.seg.seg2{grid-template-columns:repeat(2,1fr)}
+.ecols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:22px;align-items:start}
+@media (max-width:860px){.ecols{grid-template-columns:minmax(0,1fr)}}
+.estack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.estack .tiles{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.estack .tile .v{font-size:24px}
+.valgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+select{font:15px var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
+.interp{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.subh{font:600 16px var(--f-display);color:var(--head);margin:0}
+.check{display:flex;gap:8px;align-items:center;font-weight:500;font-size:14px}
+svg.chart .area{stroke:none}
+svg.chart .a-cs{fill:var(--c-pi);opacity:.2} svg.chart .a-ps{fill:var(--c-cost);opacity:.18}
+svg.chart .a-dwl{fill:var(--bad);opacity:.3} svg.chart .a-tax{fill:var(--c-alt);opacity:.22}
+svg.chart .hlab{fill:var(--muted);font-size:11px;paint-order:stroke;stroke:var(--panel);stroke-width:3px}
 .zoomnote{font-size:12px;color:var(--muted);margin:0}
 ol.steps{margin:0;padding-left:24px;display:flex;flex-direction:column;gap:12px}
 ol.steps li{padding-left:6px;line-height:1.7}
@@ -124,11 +143,18 @@ footer a{color:var(--accent-ink)}
 <body>
 <div class="wrap">
   <header>
-    <div class="eyebrow">Economics of Entrepreneurship · Marginal analysis</div>
-    <h1>Marginal Analysis Workbench</h1>
-    <p class="lede">Type a demand or revenue function and a cost function. The workbench takes the derivatives, solves MR = MC, finds revenue-maximizing and break-even output, and writes out each step so you can check your own working.</p>
+    <div class="eyebrow">Economics of Entrepreneurship</div>
+    <h1>Economics Workbench</h1>
+    <p class="lede">Type the functions from your problem. The workbench takes the derivatives, solves for the optimum, and writes out each step so you can check your own working.</p>
   </header>
 
+  <nav class="pagenav" role="tablist" aria-label="Topic">
+    <button type="button" role="tab" data-page="marginal" aria-selected="true">Marginal analysis</button>
+    <button type="button" role="tab" data-page="elasticity" aria-selected="false">Elasticity</button>
+    <button type="button" role="tab" data-page="market" aria-selected="false">Supply &amp; demand</button>
+  </nav>
+
+  <div class="page" id="page-marginal">
   <div class="presets" id="presets"><span>Load a problem</span></div>
 
   <div class="grid">
@@ -214,7 +240,104 @@ footer a{color:var(--accent-ink)}
     </div>
   </section>
 
-  <footer>Derivatives are symbolic (math.js). Optimum, break-even and critical points are found numerically on [0, capacity] and refined to about 1e-10, then rounded to 4 decimals. Source and the Python (exact-answer) version: <a href="https://github.com/IvanKovchugo/JupyterProject">github.com/IvanKovchugo/JupyterProject</a>.</footer>
+  </div>
+
+  <div class="page" id="page-elasticity" hidden>
+    <section class="panel">
+      <h2>Point elasticity</h2>
+      <div class="seg seg2" role="radiogroup" aria-label="What the problem gives">
+        <input type="radio" name="emode" id="e-direct" value="direct" checked><label for="e-direct">Demand Q = f(P, …)</label>
+        <input type="radio" name="emode" id="e-inverse" value="inverse"><label for="e-inverse">Inverse demand P(Q)</label>
+      </div>
+      <div class="presets" id="eEx"><span>Examples</span></div>
+      <div class="ecols">
+        <div class="estack">
+          <div class="field"><label for="eFn" id="eFnLbl">Q =</label><input type="text" id="eFn" spellcheck="false" value="400 - 2P + 0.5Ps + 0.1Y"></div>
+          <div class="field" id="eOwnBox"><label for="eOwn">Which variable is the good's own price?</label><select id="eOwn"></select></div>
+          <div class="field" id="eAtBox" hidden><label for="eAt">Evaluate at</label>
+            <select id="eAt"><option value="price">a price P</option><option value="quantity">a quantity Q</option></select></div>
+          <span class="lbl">Values at the point you're evaluating</span>
+          <div class="valgrid" id="eVals"></div>
+          <p class="hint" id="eHint">Name variables freely: <code>P</code> own price, <code>Ps</code> / <code>Pc</code> other goods' prices, <code>Y</code> or <code>I</code> income, <code>A</code> advertising.</p>
+          <p class="err" id="eErr" hidden></p>
+        </div>
+        <div class="estack">
+          <div class="tiles" id="eTiles"></div>
+          <ul class="interp" id="eInterp"></ul>
+          <div class="chartbox"><svg class="chart" id="eChart" viewBox="0 0 640 300" role="img" aria-label="Demand curve"></svg></div>
+        </div>
+      </div>
+      <h3 class="subh">Worked solution</h3>
+      <ol class="steps" id="eSteps"></ol>
+      <div id="ePredBox" class="estack">
+        <h3 class="subh">Predict a change</h3>
+        <p class="hint">Enter % changes. Quantity moves by %ΔQ ≈ Σ E × %Δx (a linear approximation, best for small changes).</p>
+        <div class="valgrid" id="ePct"></div>
+        <p id="ePredOut"></p>
+      </div>
+    </section>
+
+    <div class="two">
+      <section class="panel">
+        <h2>Arc elasticity</h2>
+        <p class="hint">Elasticity between two observed points, using the midpoint formula.</p>
+        <div class="field"><label for="aKind">What changed?</label>
+          <select id="aKind"><option value="own">Own price (P)</option><option value="income">Income (Y)</option><option value="cross">Price of another good (Ps)</option></select></div>
+        <div class="valgrid">
+          <div class="field"><label for="aX1" id="aX1L">P₁</label><input type="number" id="aX1" step="any" value="10"></div>
+          <div class="field"><label for="aQ1">Q₁</label><input type="number" id="aQ1" step="any" value="100"></div>
+          <div class="field"><label for="aX2" id="aX2L">P₂</label><input type="number" id="aX2" step="any" value="12"></div>
+          <div class="field"><label for="aQ2">Q₂</label><input type="number" id="aQ2" step="any" value="80"></div>
+        </div>
+        <p class="err" id="aErr" hidden></p>
+        <div class="tiles" id="aTiles" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div>
+        <p id="aText" style="margin:0"></p>
+        <ol class="steps" id="aSteps"></ol>
+      </section>
+      <section class="panel">
+        <h2>Markup pricing</h2>
+        <p class="hint">A profit-maximizing firm sets P = MC · E / (1 + E). Or, given a price, back out the elasticity it implies.</p>
+        <div class="seg seg2" role="radiogroup" aria-label="What you know">
+          <input type="radio" name="kmode" id="k-e" value="e" checked><label for="k-e">I know the elasticity</label>
+          <input type="radio" name="kmode" id="k-p" value="p"><label for="k-p">I know the price</label>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="kMC">Marginal cost MC</label><input type="number" id="kMC" step="any" value="10"></div>
+          <div class="field"><label for="kX" id="kXL">Elasticity E (negative)</label><input type="number" id="kX" step="any" value="-2"></div>
+        </div>
+        <p class="err" id="kErr" hidden></p>
+        <div class="tiles" id="kTiles" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div>
+        <ol class="steps" id="kSteps"></ol>
+      </section>
+    </div>
+  </div>
+
+  <div class="page" id="page-market" hidden>
+    <section class="panel">
+      <h2>Supply and demand</h2>
+      <p class="hint">Write demand and supply as functions of price <code>P</code> only (plug in numbers for income and other prices). Add a per-unit tax or subsidy, or a price ceiling or floor.</p>
+      <div class="presets" id="mEx"><span>Examples</span></div>
+      <div class="ecols">
+        <div class="estack">
+          <div class="field"><label for="mQd">Demand Qd(P) =</label><input type="text" id="mQd" spellcheck="false" value="100 - 2P"></div>
+          <div class="field"><label for="mQs">Supply Qs(P) =</label><input type="text" id="mQs" spellcheck="false" value="3P - 50"></div>
+          <div class="field"><label for="mTax">Per-unit tax on sellers (negative = subsidy)</label><input type="number" id="mTax" step="any" value="0"></div>
+          <label class="check" for="mCtrlOn"><input type="checkbox" id="mCtrlOn"> Add a price ceiling or floor</label>
+          <div class="field" id="mCtrlBox" hidden><label for="mCtrl">Controlled price</label><input type="number" id="mCtrl" step="any" value="25"></div>
+          <p class="err" id="mErr" hidden></p>
+        </div>
+        <div class="estack">
+          <div class="tiles" id="mTiles"></div>
+          <div class="chartbox"><svg class="chart" id="mChart" viewBox="0 0 640 300" role="img" aria-label="Supply and demand"></svg></div>
+          <ul class="legend" id="mLegend"></ul>
+        </div>
+      </div>
+      <h3 class="subh">Worked solution</h3>
+      <ol class="steps" id="mSteps"></ol>
+    </section>
+  </div>
+
+  <footer>Derivatives are symbolic (math.js). Optimum, equilibrium, break-even and critical points are found numerically and refined to about 1e-10; areas use Simpson's rule. Results are rounded to 4 decimals. Source and the Python (exact-answer) version: <a href="https://github.com/IvanKovchugo/JupyterProject">github.com/IvanKovchugo/JupyterProject</a>.</footer>
 </div>
 
 <script>
@@ -356,7 +479,7 @@ function short(v){
 function drawChart(svg, o){
   const W=640,H=300,m={l:58,r:18,t:16,b:38};
   const pw=W-m.l-m.r, ph=H-m.t-m.b, N=260;
-  const data = o.series.map(s=>{ const pts=[]; for(let i=0;i<=N;i++){ const x=o.x0+(o.x1-o.x0)*i/N; pts.push([x,s.f(x)]); } return pts; });
+  const data = o.series.map(s=>{ if(s.pts) return s.pts; const pts=[]; for(let i=0;i<=N;i++){ const x=o.x0+(o.x1-o.x0)*i/N; pts.push([x,s.f(x)]); } return pts; });
   let ys = [0]; data.forEach(p=>p.forEach(([,y])=>{ if(isFinite(y)) ys.push(y); }));
   (o.markers||[]).forEach(mk=>isFinite(mk.y)&&mk.x>=o.x0&&mk.x<=o.x1&&ys.push(mk.y));
   ys.sort((a,b)=>a-b);
@@ -375,7 +498,10 @@ function drawChart(svg, o){
   if(lo<0&&hi>0) h+=`<line class="axis" x1="${m.l}" x2="${W-m.r}" y1="${Y(0)}" y2="${Y(0)}"/>`;
   h+=`<line class="axis" x1="${m.l}" x2="${m.l}" y1="${m.t}" y2="${H-m.b}"/><line class="axis" x1="${m.l}" x2="${W-m.r}" y1="${H-m.b}" y2="${H-m.b}"/>`;
   h+=`<text x="${W-m.r}" y="${H-6}" text-anchor="end">${o.xlabel||'Q'}</text>`;
+  if(o.ylabel) h+=`<text x="${m.l+6}" y="${m.t+10}">${o.ylabel}</text>`;
   h+=`<g clip-path="url(#${id})">`;
+  (o.areas||[]).forEach(a=>{ const d=a.pts.filter(([x,y])=>isFinite(x)&&isFinite(y)).map(([x,y],i)=>(i?'L':'M')+X(x).toFixed(1)+' '+Y(y).toFixed(1)).join('')+'Z'; h+=`<path class="area ${a.cls}" d="${d}"/>`; });
+  (o.hlines||[]).forEach(l=>{ if(l.y>=lo&&l.y<=hi) h+=`<line class="vl" x1="${m.l}" x2="${W-m.r}" y1="${Y(l.y)}" y2="${Y(l.y)}"/><text class="hlab" x="${W-m.r-4}" y="${Y(l.y)-5}" text-anchor="end">${l.label||''}</text>`; });
   (o.vlines||[]).forEach(x=>{ if(x>=o.x0&&x<=o.x1) h+=`<line class="vl" x1="${X(x)}" x2="${X(x)}" y1="${m.t}" y2="${H-m.b}"/>`; });
   data.forEach((pts,i)=>{
     let d='', pen=false;
@@ -685,8 +811,322 @@ document.querySelectorAll('.tab[data-tab]').forEach(b=>b.addEventListener('click
 document.querySelectorAll('.tab[data-zoom]').forEach(b=>b.addEventListener('click',()=>{ zoom=b.dataset.zoom; document.querySelectorAll('.tab[data-zoom]').forEach(x=>x.setAttribute('aria-pressed',String(x===b))); render(); }));
 ['ffIn','ffA','ffB'].forEach(id=>$(id).addEventListener('input',()=>later(renderFree)));
 
+/* ---------- shared for elasticity & markets ---------- */
+function parseVars(str, what, allowed){
+  const raw=norm(str,false);
+  if(!raw) throw new Error(`Enter ${what}.`);
+  if(raw.length>200) throw new Error(`${cap(what)} is too long.`);
+  let node; try{ node=M.parse(raw); }catch(e){ throw new Error(`Couldn't read ${what}. Check for a missing operator or bracket.`); }
+  const names=[...new Set(node.filter(n=>n.isSymbolNode && !known(n.name)).map(n=>n.name))];
+  if(allowed){ const bad=names.filter(n=>!allowed.includes(n)); if(bad.length) throw new Error(`${cap(what)} uses "${bad[0]}". Use only ${allowed.join(', ')} and plug numbers in for anything else.`); }
+  return {node, names};
+}
+const ev=(node,scope)=>{ try{ const r=node.evaluate(scope); return typeof r==='number'?r:NaN; }catch(e){ return NaN; } };
+function simpson(g,a,b,n=2000){
+  if(!(b>a)) return 0; const h=(b-a)/n; let s=g(a)+g(b);
+  for(let i=1;i<n;i++) s+=(i%2?4:2)*g(a+i*h);
+  return s*h/3;
+}
+function rootFrom(g, lo){
+  for(const L of [100,1e4,1e6]){ if(L<=lo) continue; const r=roots(g,lo,L,6000).filter(x=>x>lo+1e-12); if(r.length) return r[0]; }
+  return null;
+}
+function roleOf(n, own){
+  const l=n.toLowerCase();
+  if(n===own) return 'own price';
+  if(['y','i','m','inc','income'].includes(l)) return 'income';
+  if(n[0]==='P') return 'price of a related good';
+  if(['a','adv','ad'].includes(l)) return 'advertising';
+  return 'other';
+}
+function interpret(rl,e,n){
+  const a=Math.abs(e);
+  if(rl==='own price'){
+    if(Math.abs(a-1)<1e-9) return '<b>Unit elastic</b>: a small price change leaves revenue unchanged; revenue is at its maximum.';
+    if(a>1) return `<b>Elastic</b> (|E| &gt; 1): a 1% price rise cuts quantity by ${fmt(a,3)}%, so raising price lowers revenue and cutting it raises revenue.`;
+    return `<b>Inelastic</b> (|E| &lt; 1): a 1% price rise cuts quantity by only ${fmt(a,3)}%, so raising price raises revenue.`;
+  }
+  if(rl==='income'){
+    if(e<0) return `<b>Inferior good</b> (E &lt; 0): a 1% income rise lowers quantity by ${fmt(a,3)}%.`;
+    if(e>1) return `<b>Normal good, luxury</b> (E &gt; 1): a 1% income rise raises quantity by ${fmt(e,3)}%.`;
+    return `<b>Normal good, necessity</b> (0 &lt; E &lt; 1): a 1% income rise raises quantity by ${fmt(e,3)}%.`;
+  }
+  if(rl==='price of a related good'){
+    if(Math.abs(e)<1e-12) return '<b>Unrelated goods</b> (E = 0).';
+    return `<b>${e>0?'Substitutes':'Complements'}</b> (E ${e>0?'&gt;':'&lt;'} 0): a 1% rise in ${n} ${e>0?'raises':'lowers'} quantity by ${fmt(a,3)}%.`;
+  }
+  return `A 1% increase in ${n} ${e>0?'raises':'lowers'} quantity by ${fmt(a,3)}%.`;
+}
+const showErr=(id,msg)=>{ $(id).textContent=msg||''; $(id).hidden=!msg; };
+const numIn=id=>{ const v=parseFloat(String($(id).value).replace(',','.')); return isFinite(v)?v:null; };
+
+/* ---------- point elasticity ---------- */
+const E_EX=[
+  {label:'Q = 400 − 2P + 0.5Ps + 0.1Y', mode:'direct', fn:'400 - 2P + 0.5Ps + 0.1Y', vals:{P:100,Ps:200,Y:1000}},
+  {label:'Q = 100 − 2P', mode:'direct', fn:'100 - 2P', vals:{P:10}},
+  {label:'Q = 1000·P^−1.5·Y^0.8', mode:'direct', fn:'1000 P^(-1.5) Y^0.8', vals:{P:4,Y:50}},
+  {label:'P = 120 − 0.5Q', mode:'inverse', fn:'120 - 0.5Q', at:'price', vals:{x:110}},
+];
+let emode='direct', eVals={P:100,Ps:200,Y:1000}, eNames='', ePctVals={};
+function setEMode(m){
+  emode=m; $('e-'+m).checked=true;
+  $('eFnLbl').textContent = m==='direct' ? 'Q =' : 'P(Q) =';
+  $('eOwnBox').hidden = m!=='direct'; $('eAtBox').hidden = m==='direct';
+  $('eHint').hidden = m!=='direct'; $('ePredBox').hidden = m!=='direct';
+  eNames='';
+}
+function buildVals(names){
+  const key=names.join('|'); if(key===eNames) return; eNames=key;
+  $('eVals').innerHTML=names.map(n=>`<div class="field"><label for="ev-${n}">${n}</label><input type="number" id="ev-${n}" step="any" value="${eVals[n]??''}"></div>`).join('');
+  names.forEach(n=>$('ev-'+n).addEventListener('input',()=>{ eVals[n]=numIn('ev-'+n); later2(renderPoint); }));
+  if(emode==='direct'){
+    $('ePct').innerHTML=names.map(n=>`<div class="field"><label for="ep-${n}">% change in ${n}</label><input type="number" id="ep-${n}" step="any" value="${ePctVals[n]??0}"></div>`).join('');
+    names.forEach(n=>$('ep-'+n).addEventListener('input',()=>{ ePctVals[n]=numIn('ep-'+n)||0; renderPoint(); }));
+  }
+}
+function demandChart(qOf, p0, q0, rev, label){
+  const top=Math.max(2.2*p0, rev?1.4*rev.p:0);
+  const pts=[]; for(let i=1;i<=300;i++){ const p=top*i/300, q=qOf(p); if(isFinite(q)&&q>=0) pts.push([q,p]); }
+  const xmax=Math.min(Math.max(...pts.map(t=>t[0]),q0*1.2), 2.5*Math.max(q0, rev?rev.q:0)) || 1;
+  const markers=[{x:q0,y:p0,cls:'s-pi',label}];
+  if(rev) markers.push({x:rev.q,y:rev.p,cls:'s-cost',label:'Unit elastic · max revenue'});
+  drawChart($('eChart'),{x0:0,x1:xmax*1.05,series:[{pts,cls:'s-rev'}],markers,xlabel:'Quantity Q',ylabel:'Price P'});
+}
+function renderPoint(){
+  showErr('eErr','');
+  try{
+    if(emode==='direct') pointDirect(); else pointInverse();
+  }catch(e){ showErr('eErr',e.message); }
+}
+function pointDirect(){
+  const {node,names}=parseVars($('eFn').value,'the demand function');
+  if(!names.length) throw new Error('The demand function needs at least one variable, e.g. P.');
+  names.sort((a,b)=>(a!=='P')-(b!=='P')||a.localeCompare(b));
+  const sel=$('eOwn'), prev=sel.value;
+  sel.innerHTML=names.map(n=>`<option${n===(names.includes(prev)?prev:names[0])?' selected':''}>${n}</option>`).join('');
+  const own=sel.value;
+  buildVals(names);
+  const scope={}; for(const n of names){ const v=eVals[n]; if(v===null||v===undefined||!isFinite(v)) throw new Error(`Give a value for ${n}.`); scope[n]=v; }
+  const q0=ev(node,scope);
+  if(!(q0>0)) throw new Error(`Quantity at these values is ${fmt(q0)}; elasticity needs a positive quantity.`);
+  const order=[...names].sort((a,b)=>(a!==own)-(b!==own)||(roleOf(a,own)!=='income')-(roleOf(b,own)!=='income')||a.localeCompare(b));
+  const rows=order.map(n=>{ const d=M.derivative(node,n), dv=ev(d,scope), e=dv*scope[n]/q0, rl=roleOf(n,own); return {n,rl,d,dv,e}; });
+  let t=tile('Quantity Q',fmt(q0),'at these values');
+  rows.forEach(r=>{ t+=tile(`E · ${r.n}`,fmt(r.e,4),r.rl,r.n===own); });
+  $('eTiles').innerHTML=t;
+  $('eInterp').innerHTML=rows.map(r=>`<li><b>${r.n}:</b> ${interpret(r.rl,r.e,r.n)}</li>`).join('');
+  const st=[`Quantity at the given values: ${eq('Q = '+tidy(M.simplify(node).toString())+' = '+fmt(q0))}`];
+  rows.forEach(r=>{ const ds=tidy(M.simplify(r.d).toString()), konst=!r.d.filter(x=>x.isSymbolNode&&!known(x.name)).length; st.push(`${eq(`∂Q/∂${r.n} = ${konst?fmt(r.dv):ds}`)}${konst?'':' = '+fmt(r.dv)}, so ${eq(`E_${r.n} = ∂Q/∂${r.n} · ${r.n}/Q = ${fmt(r.dv)} × ${fmt(scope[r.n])} / ${fmt(q0)} = ${fmt(r.e,4)}`)} (${r.rl})`); });
+  // revenue-maximizing own price, others held fixed
+  let rev=null;
+  if(names.includes(own)){
+    const qOf=p=>ev(node,{...scope,[own]:p});
+    const Rn=M.parse(`${own}*(${node.toString()})`), dR=M.derivative(Rn,own);
+    const dRf=p=>ev(dR,{...scope,[own]:p}), Rf=p=>p*qOf(p);
+    const cand=roots(dRf,1e-9,Math.max(10*scope[own],1000),6000).filter(p=>p>0&&qOf(p)>0);
+    if(cand.length){ const p=cand.reduce((a,b)=>Rf(b)>Rf(a)?b:a); rev={p,q:qOf(p),R:Rf(p)};
+      st.push(`Revenue ${eq(`R = ${own}·Q`)} is largest where ${eq(`dR/d${own} = 0`)}, which is where ${eq(`E_${own} = −1`)}: ${eq(`${own} = ${fmt(p)}`)}, ${eq(`Q = ${fmt(rev.q)}`)}, ${eq(`R = ${fmt(rev.R)}`)}.`); }
+    else st.push(`Revenue has no interior maximum in ${own} here${Math.abs(Math.abs(rows[0].e)-1)<1e-9?' (unit elastic everywhere)':''}: with constant elasticity, revenue moves in one direction as price changes.`);
+    demandChart(qOf, scope[own], q0, rev, `E = ${fmt(rows[0].e,3)}`);
+  }
+  $('eSteps').innerHTML=st.map(x=>`<li>${x}</li>`).join('');
+  // prediction
+  let total=0; const parts=[];
+  rows.forEach(r=>{ const d=+ePctVals[r.n]||0; if(d){ total+=r.e*d; parts.push(`${fmt(r.e,4)} × ${fmt(d,2)}%`); } });
+  $('ePredOut').innerHTML = parts.length
+    ? `${eq(`%ΔQ ≈ ${parts.join(' + ')} = ${fmt(total,4)}%`)} → Q goes from ${fmt(q0)} to about <b>${fmt(q0*(1+total/100))}</b>.`
+    : 'Enter a % change above to see the predicted effect on quantity.';
+}
+function pointInverse(){
+  const {node,names}=parseVars(norm($('eFn').value,true),'the inverse demand curve',['Q']);
+  const Pq=fn(node), dn=M.derivative(node,'Q'), slopeF=fn(dn);
+  const by=$('eAt').value;
+  buildVals(['x']);
+  $('eVals').querySelector('label').textContent = by==='price' ? 'Price P' : 'Quantity Q';
+  const x=eVals.x; if(x===null||x===undefined||!isFinite(x)) throw new Error('Enter a value.');
+  let q0;
+  if(by==='quantity') q0=x;
+  else { const r=rootFrom(q=>Pq(q)-x,0); if(r===null) throw new Error(`No positive quantity gives P = ${fmt(x)} on this demand curve.`); q0=r; }
+  const p0=Pq(q0), sl=slopeF(q0);
+  if(!(q0>0)||sl===0||!isFinite(sl)) throw new Error('Elasticity is undefined here (flat demand or zero quantity).');
+  const e=p0/(q0*sl);
+  $('eTiles').innerHTML=tile('Quantity Q',fmt(q0),'')+tile('Price P',fmt(p0),'')+tile('Elasticity E',fmt(e,4),'own price',true);
+  $('eInterp').innerHTML=`<li>${interpret('own price',e,'P')}</li>`;
+  const st=[`At ${eq('Q = '+fmt(q0))}: ${eq('P = '+show(node)+' = '+fmt(p0))}`,
+    `Slope ${eq('dP/dQ = '+show(dn)+' = '+fmt(sl))}, so ${eq('dQ/dP = 1/'+fmt(sl))}`,
+    `${eq(`E = dQ/dP · P/Q = (1/${fmt(sl)}) × ${fmt(p0)} / ${fmt(q0)} = ${fmt(e,4)}`)}`];
+  const Rn=M.parse(`(${node.toString()})*Q`), MRf=fn(M.derivative(Rn,'Q'));
+  const end=rootFrom(Pq,0)||Math.max(10*q0,1000);
+  const cand=roots(MRf,0,end).filter(q=>q>0);
+  let rev=null;
+  if(cand.length){ const q=cand[0]; rev={q,p:Pq(q),R:q*Pq(q)}; st.push(`Revenue peaks where ${eq('MR = 0')} (unit elastic): ${eq('Q = '+fmt(q))}, ${eq('P = '+fmt(rev.p))}, ${eq('R = '+fmt(rev.R))}.`); }
+  $('eSteps').innerHTML=st.map(x=>`<li>${x}</li>`).join('');
+  const qOf=p=>{ const r=rootFrom(q=>Pq(q)-p,0); return r===null?NaN:r; };
+  const top=Math.max(Pq(0)||0, 1.2*p0), pts=[];
+  const qEnd=end*1.0; for(let i=0;i<=300;i++){ const q=qEnd*i/300, p=Pq(q); if(isFinite(p)&&p>=0) pts.push([q,p]); }
+  const markers=[{x:q0,y:p0,cls:'s-pi',label:`E = ${fmt(e,3)}`}]; if(rev) markers.push({x:rev.q,y:rev.p,cls:'s-cost',label:'Unit elastic · max revenue'});
+  drawChart($('eChart'),{x0:0,x1:qEnd||1,series:[{pts,cls:'s-rev'}],markers,xlabel:'Quantity Q',ylabel:'Price P'});
+}
+
+/* ---------- arc elasticity ---------- */
+function renderArc(){
+  showErr('aErr','');
+  const kind=$('aKind').value, lab={own:'P',income:'Y',cross:'Ps'}[kind];
+  $('aX1L').textContent=lab+'₁'; $('aX2L').textContent=lab+'₂';
+  const x1=numIn('aX1'), q1=numIn('aQ1'), x2=numIn('aX2'), q2=numIn('aQ2');
+  try{
+    if([x1,q1,x2,q2].some(v=>v===null)) throw new Error('Fill in all four values.');
+    if(x1===x2) throw new Error(`The two ${lab} values must differ.`);
+    if(q1+q2===0||x1+x2===0) throw new Error('Averages can\'t be zero.');
+    const dq=q2-q1, dx=x2-x1, mq=(q1+q2)/2, mx=(x1+x2)/2, e=(dq/mq)/(dx/mx), simple=(dq/q1)/(dx/x1);
+    const rl={own:'own price',income:'income',cross:'price of a related good'}[kind];
+    $('aTiles').innerHTML=tile('Arc elasticity',fmt(e,4),'midpoint formula',true)+tile('Simple % (from point 1)',fmt(simple,4),'base = starting point');
+    $('aText').innerHTML=interpret(rl,e,lab);
+    const st=[`${eq(`%ΔQ = (Q₂ − Q₁) / ((Q₁ + Q₂)/2) = ${fmt(dq)} / ${fmt(mq)} = ${fmt(dq/mq*100,2)}%`)}`,
+      `${eq(`%Δ${lab} = (${lab}₂ − ${lab}₁) / ((${lab}₁ + ${lab}₂)/2) = ${fmt(dx)} / ${fmt(mx)} = ${fmt(dx/mx*100,2)}%`)}`,
+      `${eq(`E = %ΔQ / %Δ${lab} = ${fmt(e,4)}`)}`,
+      `The midpoint formula gives the same answer in either direction. Using point 1 as the base instead gives ${fmt(simple,4)}.`];
+    if(kind==='own'){ const r1=x1*q1, r2=x2*q2; st.push(`Revenue: ${fmt(x1)} × ${fmt(q1)} = ${fmt(r1)} → ${fmt(x2)} × ${fmt(q2)} = ${fmt(r2)} (${r2>r1?'up':r2<r1?'down':'unchanged'} ${fmt(Math.abs(r2-r1))}).`); }
+    $('aSteps').innerHTML=st.map(x=>`<li>${x}</li>`).join('');
+  }catch(e){ showErr('aErr',e.message); $('aTiles').innerHTML=''; $('aSteps').innerHTML=''; $('aText').textContent=''; }
+}
+
+/* ---------- markup ---------- */
+let kmode='e';
+function renderMarkup(){
+  showErr('kErr','');
+  $('kXL').textContent = kmode==='e' ? 'Elasticity E (negative)' : 'Current price P';
+  const mc=numIn('kMC'), x=numIn('kX');
+  try{
+    if(mc===null||mc<0) throw new Error('Enter a marginal cost of 0 or more.');
+    if(x===null) throw new Error(kmode==='e'?'Enter the elasticity.':'Enter the price.');
+    let st;
+    if(kmode==='e'){
+      if(x>=-1) throw new Error('At |E| ≤ 1 demand is inelastic: raising price always adds profit, so there is no finite optimum. A profit-maximizing firm always prices where |E| > 1.');
+      const p=mc*x/(1+x), L=-1/x;
+      $('kTiles').innerHTML=tile('Profit-maximizing price',fmt(p),'P = MC·E/(1+E)',true)+tile('Markup (Lerner)',fmt(L*100,2)+'%','(P − MC)/P');
+      st=['Profit is maximized where MR = MC, and '+eq('MR = P(1 + 1/E)')+'.',
+        `${eq(`P = MC / (1 + 1/E) = MC · E/(1 + E) = ${fmt(mc)} × ${fmt(x)} / ${fmt(1+x)} = ${fmt(p)}`)}`,
+        `Lerner index ${eq(`(P − MC)/P = −1/E = ${fmt(L*100,2)}%`)}; markup on cost ${eq(`(P − MC)/MC = ${mc?fmt((p/mc-1)*100,2)+'%':'—'}`)}. The more elastic demand is, the smaller the markup.`];
+    } else {
+      if(x<=mc) throw new Error('Price must be above marginal cost to back out an elasticity.');
+      const L=(x-mc)/x, e=-1/L;
+      $('kTiles').innerHTML=tile('Implied elasticity',fmt(e,4),'if this price is optimal',true)+tile('Markup (Lerner)',fmt(L*100,2)+'%','(P − MC)/P');
+      st=[`${eq(`(P − MC)/P = (${fmt(x)} − ${fmt(mc)}) / ${fmt(x)} = ${fmt(L*100,2)}%`)}`,
+        `If the price is profit-maximizing, ${eq(`−1/E = ${fmt(L,4)}`)}, so ${eq(`E = ${fmt(e,4)}`)}.`];
+    }
+    $('kSteps').innerHTML=st.map(x=>`<li>${x}</li>`).join('');
+  }catch(e){ showErr('kErr',e.message); $('kTiles').innerHTML=''; $('kSteps').innerHTML=''; }
+}
+
+/* ---------- market ---------- */
+const M_EX=[
+  {label:'Linear', qd:'100 - 2P', qs:'3P - 50', tax:0},
+  {label:'Linear with a tax of 5', qd:'100 - 2P', qs:'3P - 50', tax:5},
+  {label:'Constant elasticity', qd:'2000 P^(-1.2)', qs:'5P^1.5', tax:0},
+];
+function renderMarket(){
+  showErr('mErr','');
+  const nP=s=>s.replace(/\bp\b/g,'P');
+  try{
+    const d=parseVars(nP($('mQd').value),'demand Qd(P)',['P']), s=parseVars(nP($('mQs').value),'supply Qs(P)',['P']);
+    const Qd=p=>ev(d.node,{P:p}), Qs=p=>ev(s.node,{P:p});
+    const dQd=M.derivative(d.node,'P'), dQs=M.derivative(s.node,'P');
+    let pe=null; for(const L of [100,1e4,1e6]){ const r=roots(p=>Qd(p)-Qs(p),0,L,8000).filter(p=>Qd(p)>0); if(r.length){ pe=r[0]; break; } }
+    if(pe===null) throw new Error('Demand and supply don\'t cross at a positive price and quantity. Check the signs: demand should fall with P and supply should rise.');
+    const qe=Qd(pe), ed=ev(dQd,{P:pe})*pe/qe, es=ev(dQs,{P:pe})*pe/qe;
+    const choke=rootFrom(Qd,pe);
+    const pmin=Qs(0)<0 ? (rootFrom(Qs,0)??0) : 0;
+    const cs=choke!==null?simpson(Qd,pe,choke):null, ps=simpson(Qs,pmin,pe);
+    const cls=Math.abs(ed)>1?'elastic':Math.abs(ed)<1?'inelastic':'unit elastic';
+    const st=[`Equilibrium: ${eq('Qd = Qs')} → ${eq(show(d.node,'P')+' = '+show(s.node,'P'))} → ${eq('P* = '+fmt(pe))}, ${eq('Q* = '+fmt(qe))}`,
+      `Demand elasticity at equilibrium: ${eq(`E_d = Qd′(P) · P*/Q* = ${fmt(ev(dQd,{P:pe}))} × ${fmt(pe)} / ${fmt(qe)} = ${fmt(ed,4)}`)} (${cls})`,
+      `Supply elasticity at equilibrium: ${eq(`E_s = Qs′(P) · P*/Q* = ${fmt(ev(dQs,{P:pe}))} × ${fmt(pe)} / ${fmt(qe)} = ${fmt(es,4)}`)}`,
+      cs!==null ? `Consumer surplus = area under demand above P*: ${eq(`∫ Qd dP from ${fmt(pe)} to ${fmt(choke)} = ${fmt(cs)}`)} (demand reaches zero at P = ${fmt(choke)})` : 'Consumer surplus is unbounded because demand never reaches zero.',
+      `Producer surplus = area above supply below P*: ${eq(`∫ Qs dP from ${fmt(pmin)} to ${fmt(pe)} = ${fmt(ps)}`)}`];
+    let t=tile('Equilibrium price P*',fmt(pe),'Qd = Qs',true)+tile('Equilibrium quantity Q*',fmt(qe),'')+tile('Consumer surplus',cs!==null?fmt(cs):'∞','')+tile('Producer surplus',fmt(ps),'');
+    const tax=numIn('mTax')||0;
+    const top=choke!==null?choke*1.05:2.5*pe;
+    const series=[], areas=[], hlines=[], markers=[{x:qe,y:pe,cls:'s-pi',label:'Equilibrium'}];
+    const curve=(g,a,b)=>{ const pts=[]; for(let i=0;i<=300;i++){ const p=a+(b-a)*i/300, q=g(p); if(isFinite(q)&&q>=0) pts.push([q,p]); } return pts; };
+    series.push({pts:curve(Qd,0,top),cls:'s-rev'},{pts:curve(Qs,pmin,top),cls:'s-cost'});
+    const leg=[['b-rev','Demand'],['b-cost','Supply'],['b-pi','Consumer surplus'],['b-cost','Producer surplus']];
+    let csLo=pe, psHi=pe, qline=qe;
+    if(tax){
+      let pb=null; for(const L of [100,1e4,1e6]){ const r=roots(p=>Qd(p)-Qs(p-tax),0,L,8000).filter(p=>Qd(p)>0); if(r.length){ pb=r[0]; break; } }
+      if(pb===null) throw new Error('With this tax the market shuts down (no positive quantity is traded).');
+      const psel=pb-tax, qt=Qd(pb), rev=tax*qt;
+      const cs1=choke!==null?simpson(Qd,pb,choke):null, ps1=psel>pmin?simpson(Qs,pmin,psel):0;
+      const dwl=cs!==null?cs+ps-cs1-ps1-rev:null, share=(pb-pe)/tax, approx=es/(es-ed), word=tax>0?'tax':'subsidy';
+      t+=tile('Buyers pay',fmt(pb),`${pb>=pe?'+':'−'}${fmt(Math.abs(pb-pe))} vs P*`)+tile('Sellers keep',fmt(psel),`${psel>=pe?'+':'−'}${fmt(Math.abs(psel-pe))} vs P*`)
+        +tile(tax>0?'Tax revenue':'Subsidy cost',fmt(Math.abs(rev)),`${fmt(Math.abs(tax))} × ${fmt(qt)}`)+tile('Deadweight loss',dwl!==null?fmt(dwl):'—','lost surplus');
+      st.push(`Per-unit ${word} ${eq('t = '+fmt(Math.abs(tax)))} on sellers: they keep P − t, so solve ${eq('Qd(P) = Qs(P − t)')} → buyers pay ${eq('P_b = '+fmt(pb))}, sellers get ${eq('P_s = '+fmt(psel))}, ${eq('Q = '+fmt(qt))}`,
+        `Burden: buyers ${tax>0?'pay':'save'} ${fmt(Math.abs(pb-pe))} per unit (${fmt(share*100,2)}%), sellers ${fmt(Math.abs(pe-psel))} (${fmt((1-share)*100,2)}%). Check: buyers' share ≈ ${eq(`E_s / (E_s − E_d) = ${fmt(approx,4)}`)}. The less elastic side bears more.`,
+        `${tax>0?'Tax revenue':'Subsidy cost'} ${eq(`t · Q = ${fmt(Math.abs(rev))}`)}${dwl!==null?`; deadweight loss ${eq(`(CS₀ + PS₀) − (CS₁ + PS₁ ${tax>0?'+':'−'} ${tax>0?'revenue':'cost'}) = ${fmt(dwl)}`)}`:''}`);
+      series.push({pts:curve(p=>Qs(p-tax),pmin+tax,top),cls:'s-cost',dash:true});
+      hlines.push({y:pb,label:'buyers pay'},{y:psel,label:'sellers keep'});
+      if(tax>0){
+        areas.push({cls:'a-tax',pts:[[0,psel],[qt,psel],[qt,pb],[0,pb]]});
+        const tri=[]; for(let i=0;i<=60;i++){ const p=pb+(pe-pb)*i/60; tri.push([Qd(p),p]); } for(let i=0;i<=60;i++){ const p=pe+(psel-pe)*i/60; tri.push([Qs(p),p]); }
+        areas.push({cls:'a-dwl',pts:tri});
+        leg.push(['b-alt','Tax revenue'],['b-dwl','Deadweight loss']);
+      }
+      csLo=pb; psHi=psel; qline=qt;
+      markers.push({x:qt,y:pb,cls:'s-rev',label:`Q with ${word} = ${fmt(qt,2)}`});
+    }
+    if(choke!==null){ const a=[[0,csLo]]; for(let i=0;i<=80;i++){ const p=csLo+(choke-csLo)*i/80; a.push([Qd(p),p]); } a.push([0,choke]); areas.unshift({cls:'a-cs',pts:a}); }
+    if(psHi>pmin){ const a=[[0,pmin]]; for(let i=0;i<=80;i++){ const p=pmin+(psHi-pmin)*i/80; a.push([Qs(p),p]); } a.push([0,psHi]); areas.unshift({cls:'a-ps',pts:a}); }
+    if($('mCtrlOn').checked){
+      const pc=numIn('mCtrl');
+      if(pc!==null){
+        const d_=Qd(pc), s_=Qs(pc);
+        if(pc<pe) st.push(`A price ceiling at ${fmt(pc)} is <b>binding</b> (below P* = ${fmt(pe)}): Qd = ${fmt(d_)}, Qs = ${fmt(s_)}, a <b>shortage of ${fmt(d_-s_)}</b>. Only ${fmt(Math.max(s_,0))} units are sold.`);
+        else if(pc>pe) st.push(`A price floor at ${fmt(pc)} is <b>binding</b> (above P* = ${fmt(pe)}): Qd = ${fmt(d_)}, Qs = ${fmt(s_)}, a <b>surplus of ${fmt(s_-d_)}</b>. Only ${fmt(Math.max(d_,0))} units are sold.`);
+        else st.push('The controlled price equals the equilibrium price, so it changes nothing.');
+        st[st.length-1]+=' (A ceiling above, or a floor below, the equilibrium price would not bind.)';
+        hlines.push({y:pc,label:pc<pe?'price ceiling':pc>pe?'price floor':'controlled price'});
+      }
+    }
+    $('mTiles').innerHTML=t;
+    $('mSteps').innerHTML=st.map(x=>`<li>${x}</li>`).join('');
+    const xmax=Math.min(Math.max(qe, ...series.flatMap(sr=>sr.pts.map(q=>q[0]))), 3*qe)*1.05;
+    drawChart($('mChart'),{x0:0,x1:xmax,series,areas,hlines,markers,xlabel:'Quantity Q',ylabel:'Price P'});
+    $('mLegend').innerHTML=leg.map(([c,l])=>`<li><i class="${c}"${/surplus|revenue|loss/.test(l)?' style="height:10px;opacity:.5"':''}></i>${l}</li>`).join('');
+  }catch(e){ showErr('mErr',e.message); }
+}
+
+/* ---------- page navigation ---------- */
+const PAGES=['marginal','elasticity','market'];
+function showPage(id){
+  if(!PAGES.includes(id)) id='marginal';
+  PAGES.forEach(p=>{ $('page-'+p).hidden = p!==id; });
+  document.querySelectorAll('.pagenav button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.page===id)));
+  try{ history.replaceState(null,'',id==='marginal'?location.pathname:'#'+id); }catch(e){}
+  if(id==='elasticity'){ renderPoint(); renderArc(); renderMarkup(); }
+  if(id==='market') renderMarket();
+}
+let tmr2; const later2=f=>{ clearTimeout(tmr2); tmr2=setTimeout(f,180); };
+document.querySelectorAll('.pagenav button').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+E_EX.forEach(x=>{ const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=x.label;
+  b.onclick=()=>{ setEMode(x.mode); $('eFn').value=x.fn; if(x.at) $('eAt').value=x.at; eVals={...x.vals}; ePctVals={}; renderPoint(); }; $('eEx').appendChild(b); });
+M_EX.forEach(x=>{ const b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=x.label;
+  b.onclick=()=>{ $('mQd').value=x.qd; $('mQs').value=x.qs; $('mTax').value=x.tax; renderMarket(); }; $('mEx').appendChild(b); });
+document.querySelectorAll('input[name=emode]').forEach(r=>r.addEventListener('change',()=>{ setEMode(r.value);
+  if(r.value==='inverse'){ $('eFn').value='120 - 0.5Q'; eVals={x:110}; $('eAt').value='price'; } else { $('eFn').value=E_EX[0].fn; eVals={...E_EX[0].vals}; }
+  renderPoint(); }));
+$('eFn').addEventListener('input',()=>later2(renderPoint));
+$('eOwn').addEventListener('change',renderPoint);
+$('eAt').addEventListener('change',()=>{ eVals={x:$('eAt').value==='price'?110:20}; eNames=''; renderPoint(); });
+['aKind','aX1','aQ1','aX2','aQ2'].forEach(id=>$(id).addEventListener('input',renderArc));
+document.querySelectorAll('input[name=kmode]').forEach(r=>r.addEventListener('change',()=>{ kmode=r.value; $('kX').value=kmode==='e'?-2:20; renderMarkup(); }));
+['kMC','kX'].forEach(id=>$(id).addEventListener('input',renderMarkup));
+['mQd','mQs','mTax','mCtrl'].forEach(id=>$(id).addEventListener('input',()=>later2(renderMarket)));
+$('mCtrlOn').addEventListener('change',()=>{ $('mCtrlBox').hidden=!$('mCtrlOn').checked; renderMarket(); });
+
 if(!load()) { applyPreset(PRESETS[1]); } else { markPresets(); render(); }
 renderFree();
+showPage(location.hash.slice(1));
+window.addEventListener('hashchange',()=>showPage(location.hash.slice(1)));
 })();
 </script>
 </body>

@@ -25,3 +25,25 @@ def test_bad_input_shows_error():
     at = AppTest.from_file("app.py", default_timeout=60).run()
     at.text_input(key="cost").input("420 + 60x").run()
     assert at.error and "Write quantity as Q" in at.error[0].value
+
+
+ELASTICITY_PAGE = "pages/1_Elasticity_and_markets.py"
+
+
+def test_elasticity_page_defaults_render():
+    at = AppTest.from_file(ELASTICITY_PAGE, default_timeout=60).run()
+    assert not at.exception and not at.error
+    labels = {m.label: m.value for m in at.metric}
+    assert labels["Quantity Q"] == "400"
+    assert labels["Equilibrium price P*"] == "30" and labels["Consumer surplus"] == "400"
+    assert labels["Profit-maximizing price"] == "20"
+
+
+def test_elasticity_page_tax_and_inverse_mode():
+    at = AppTest.from_file(ELASTICITY_PAGE, default_timeout=60).run()
+    next(n for n in at.number_input if n.label.startswith("Per-unit tax")).set_value(5.0).run()
+    labels = {m.label: m.value for m in at.metric}
+    assert labels["Buyers pay"] == "33" and labels["Deadweight loss"] == "15"
+    at.radio[0].set_value("Inverse demand P(Q)").run()
+    assert not at.exception
+    assert {m.label: m.value for m in at.metric}["Elasticity E"] == "−11"
